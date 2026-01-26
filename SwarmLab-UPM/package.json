@@ -1,0 +1,19 @@
+{
+  "name": "com.xaxam.swarmlab",
+  "version": "1.0.0",
+  "displayName": "SwarmLab",
+  "description": "Package to simplify the creation of rule-based particle systems within the runtime environment.",
+  "unity": "6.2",
+  "samples": [
+    {
+      "displayName": "Demo Scene",
+      "description": "Demo Scene",
+      "path": "Samples/"
+    }
+  ],
+  "author": {
+    "name": "Xaxam",
+    "email": "",
+    "url": ""
+  }
+}
