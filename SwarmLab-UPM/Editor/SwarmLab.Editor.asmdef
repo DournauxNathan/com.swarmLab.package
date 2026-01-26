@@ -1,0 +1,16 @@
+{
+    "name": "SwarmLab.Editor",
+    "rootNamespace": "",
+    "references": [
+        "SwarmLab.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
