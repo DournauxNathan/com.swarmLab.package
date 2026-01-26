@@ -12,7 +12,7 @@ Unity 6000.2 or later versions.
 Installation
 ---
 You can install via git url by adding this entry in your manifest.json:
-```https://github.com/DournauxNathan/SwarmLab.git#upm```
+```https://github.com/xaxam2001/SwarmLab.git```
 
 Documentation
 ---
