@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SwarmLab
 {
@@ -14,7 +15,7 @@ namespace SwarmLab
         public SwarmConfig Config => swarmConfig;
         
         // Runtime list of entities
-        [SerializeField] List<Entity> _entities = new List<Entity>();
+        [FormerlySerializedAs("_entities")] [SerializeField] private List<Entity> entities = new List<Entity>();
         
         // Cache rules per species
         private Dictionary<SpeciesDefinition, List<SteeringRule>> _rulesMap = new Dictionary<SpeciesDefinition, List<SteeringRule>>();
@@ -25,11 +26,11 @@ namespace SwarmLab
             Instance = this;
     
             // 1. SAFETY: Remove any entities whose GameObjects were deleted manually
-            _entities.RemoveAll(e => e.Transform == null);
+            entities.RemoveAll(e => e.Transform == null);
 
             // 2. SAFETY: If the list is empty (e.g. first time setup), try to rebuild it
             // (Optional: if you trust yourself to always click "Generate", you can remove this)
-            if (_entities.Count == 0 && transform.childCount > 0)
+            if (entities.Count == 0 && transform.childCount > 0)
             {
                 // RebuildFromScene(); // Only needed if you want to support manual scene editing
             }
@@ -50,7 +51,7 @@ namespace SwarmLab
         
         private void Update()
         {
-            if (_entities == null || _entities.Count == 0) return;
+            if (entities == null || entities.Count == 0) return;
 
             float dt = Time.deltaTime;
 
@@ -62,7 +63,7 @@ namespace SwarmLab
             // Note: For 100-300 entities, this O(N^2) loop is fine. 
             // For 1000+, we would need a spatial grid (optimization for later).
             
-            foreach (var entity in _entities)
+            foreach (var entity in entities)
             {
                 Vector3 totalAcceleration = Vector3.zero;
 
@@ -76,7 +77,7 @@ namespace SwarmLab
                         // Accumulate the force from this rule
                         // We pass ALL entities as neighbors for now.
                         // The Rule is responsible for filtering who is close enough.
-                        Vector3 force = rule.CalculateForce(entity, _entities);
+                        Vector3 force = rule.CalculateForce(entity, entities);
                         
                         totalAcceleration += force;
                     }
@@ -95,7 +96,7 @@ namespace SwarmLab
             }
 
             // --- LOOP 2: APPLY MOVEMENT ---
-            foreach (var entity in _entities)
+            foreach (var entity in entities)
             {
                 // Move
                 entity.Position += entity.Velocity * dt;
@@ -138,7 +139,7 @@ namespace SwarmLab
             ClearSwarm();
     
             // 1. Clear the brain list immediately so we can refill it
-            _entities.Clear();
+            entities.Clear();
 
             foreach (var species in swarmConfig.speciesConfigs)
             {
@@ -170,7 +171,7 @@ namespace SwarmLab
                     newEntity.Velocity = Random.onUnitSphere * 2f; 
             
                     // Add to the main list
-                    _entities.Add(newEntity);
+                    entities.Add(newEntity);
                 }
             }
         }
@@ -196,6 +197,24 @@ namespace SwarmLab
                 // Draw a small solid sphere at the center of the zone
                 Gizmos.color = new Color(speciesColor.r, speciesColor.g, speciesColor.b, 0.4f);
                 Gizmos.DrawSphere(species.spawnOffset, 0.05f);
+                
+                foreach (var rule in species.steeringRules)
+                {
+                    if (rule is Runtime.Rules.BoundingBoxRule boxRule)
+                    {
+                        Gizmos.color = Color.yellow; // Yellow cage
+                        Gizmos.DrawWireCube(boxRule.center, boxRule.size);
+            
+                        // Optional: Draw the "Soft" threshold inside
+                        Gizmos.color = new Color(1, 1, 0, 0.3f);
+                        Vector3 thresholdSize = new Vector3(
+                            boxRule.size.x - boxRule.edgeThreshold * 2,
+                            boxRule.size.y - boxRule.edgeThreshold * 2,
+                            boxRule.size.z - boxRule.edgeThreshold * 2
+                        );
+                        Gizmos.DrawWireCube(boxRule.center, thresholdSize);
+                    }
+                }
             }
             
             Gizmos.matrix = originalMatrix;

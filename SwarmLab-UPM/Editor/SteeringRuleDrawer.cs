@@ -9,10 +9,10 @@ namespace SwarmLab.Editor
     [CustomPropertyDrawer(typeof(SteeringRule), true)]
     public class SteeringRuleDrawer : PropertyDrawer
     {
-        private const float RowHeight = 20f;
-        private const float HeaderHeight = 22f;
-        private const float Padding = 6f; 
-        private const float FieldSpacing = 2f; // Space between standard fields
+        private const float ROW_HEIGHT = 20f;
+        private const float HEADER_HEIGHT = 22f;
+        private const float PADDING = 6f; 
+        private const float FIELD_SPACING = 2f; // Space between standard fields
 
         // --- 1. Calculate Dynamic Height ---
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -21,7 +21,7 @@ namespace SwarmLab.Editor
                 return EditorGUIUtility.singleLineHeight;
 
             // Start with Header height
-            float height = EditorGUIUtility.singleLineHeight + Padding;
+            float height = EditorGUIUtility.singleLineHeight + PADDING;
 
             // A. Calculate height of Standard Fields (minDistance, maxForce, etc.)
             SerializedProperty iterator = property.Copy();
@@ -38,19 +38,19 @@ namespace SwarmLab.Editor
                     if (iterator.name == "speciesWeights") continue;
 
                     // Add the height of this specific field (e.g. float, Vector3, etc.)
-                    height += EditorGUI.GetPropertyHeight(iterator, true) + FieldSpacing;
+                    height += EditorGUI.GetPropertyHeight(iterator, true) + FIELD_SPACING;
                 }
                 while (iterator.NextVisible(false));
             }
 
             // B. Calculate height of the Species Table
-            height += Padding; // Space before table
+            height += PADDING; // Space before table
             var speciesList = GetSpeciesFromConfig(property.serializedObject);
             
             if (speciesList.Count > 0)
-                height += HeaderHeight + (speciesList.Count * RowHeight);
+                height += HEADER_HEIGHT + (speciesList.Count * ROW_HEIGHT);
             else
-                height += RowHeight;
+                height += ROW_HEIGHT;
 
             return height;
         }
@@ -75,7 +75,7 @@ namespace SwarmLab.Editor
             // Draw Rule Title
             string typeName = property.managedReferenceValue.GetType().Name;
             EditorGUI.LabelField(currentRect, $"{label.text} ({typeName})", EditorStyles.boldLabel);
-            currentRect.y += EditorGUIUtility.singleLineHeight + Padding;
+            currentRect.y += EditorGUIUtility.singleLineHeight + PADDING;
 
             // --- A. DRAW STANDARD FIELDS ---
             // Iterate through properties again to Draw them
@@ -97,13 +97,13 @@ namespace SwarmLab.Editor
                     // Draw the field (e.g. minDistance)
                     EditorGUI.PropertyField(currentRect, iterator, true);
                     
-                    currentRect.y += h + FieldSpacing;
+                    currentRect.y += h + FIELD_SPACING;
                 }
                 while (iterator.NextVisible(false));
             }
 
             // --- B. DRAW SPECIES TABLE ---
-            currentRect.y += Padding; 
+            currentRect.y += PADDING; 
             
             SteeringRule rule = property.managedReferenceValue as SteeringRule;
             var availableSpecies = GetSpeciesFromConfig(property.serializedObject);
@@ -111,9 +111,9 @@ namespace SwarmLab.Editor
             if (availableSpecies.Count > 0)
             {
                 // Draw Header
-                Rect headerRect = new Rect(position.x, currentRect.y, position.width, HeaderHeight);
+                Rect headerRect = new Rect(position.x, currentRect.y, position.width, HEADER_HEIGHT);
                 DrawTableHeader(headerRect);
-                currentRect.y += HeaderHeight;
+                currentRect.y += HEADER_HEIGHT;
 
                 // Draw Rows
                 EditorGUI.BeginChangeCheck();
@@ -122,7 +122,7 @@ namespace SwarmLab.Editor
                 {
                     if (speciesDef == null) continue;
 
-                    Rect rowRect = new Rect(position.x, currentRect.y, position.width, RowHeight);
+                    Rect rowRect = new Rect(position.x, currentRect.y, position.width, ROW_HEIGHT);
                     
                     float currentWeight = GetCurrentWeight(rule, speciesDef);
                     float newWeight = DrawSpeciesRow(rowRect, speciesDef.name, currentWeight);
@@ -132,7 +132,7 @@ namespace SwarmLab.Editor
                         UpdateRuleWeight(rule, speciesDef, newWeight);
                     }
 
-                    currentRect.y += RowHeight;
+                    currentRect.y += ROW_HEIGHT;
                 }
 
                 if (EditorGUI.EndChangeCheck())
@@ -144,7 +144,7 @@ namespace SwarmLab.Editor
             }
             else
             {
-                Rect infoRect = new Rect(position.x, currentRect.y, position.width, RowHeight);
+                Rect infoRect = new Rect(position.x, currentRect.y, position.width, ROW_HEIGHT);
                 EditorGUI.HelpBox(infoRect, "No Species defined in SwarmConfig.", MessageType.Info);
             }
 
