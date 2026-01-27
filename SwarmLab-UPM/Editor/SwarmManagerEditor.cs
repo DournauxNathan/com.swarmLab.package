@@ -17,6 +17,36 @@ namespace SwarmLab.Editor
             SerializedProperty drawGizmosProp = serializedObject.FindProperty("drawSpawnZones");
             EditorGUILayout.PropertyField(drawGizmosProp);
 
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField("Simulation Settings", EditorStyles.boldLabel);
+            
+            SerializedProperty simModeProp = serializedObject.FindProperty("simulationMode");
+            EditorGUILayout.PropertyField(simModeProp);
+
+            // Conditional display for Planar mode
+            if (simModeProp.enumValueIndex == (int)SwarmManager.SimulationMode.Planar)
+            {
+                SerializedProperty planarBoundProp = serializedObject.FindProperty("planarBoundary");
+                SerializedProperty planarSizeProp = serializedObject.FindProperty("planarSize");
+
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(planarBoundProp);
+                EditorGUILayout.PropertyField(planarSizeProp);
+                
+                // Helper button to create plane if missing
+                if (planarBoundProp.objectReferenceValue == null)
+                {
+                    if (GUILayout.Button("Create Helper Plane"))
+                    {
+                        ((SwarmManager)target).CreatePlane();
+                    }
+                }
+                EditorGUI.indentLevel--;
+            }
+
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField("Swarm Logic", EditorStyles.boldLabel);
+
             // 3. Draw 'swarmConfig'
             SerializedProperty configProp = serializedObject.FindProperty("swarmConfig");
             
@@ -45,15 +75,34 @@ namespace SwarmLab.Editor
             }
         }
 
+        private void OnDisable()
+        {
+            if (_configEditor != null) DestroyImmediate(_configEditor);
+        }
+
         private void DrawEmbeddedConfigInspector(Object configObject)
         {
+            if (configObject == null) return;
+
             EditorGUILayout.Space();
             Rect rect = EditorGUILayout.GetControlRect(false, 1);
             EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1));
             EditorGUILayout.Space();
 
+            // Safety: Ensure we don't hold onto an editor with a destroyed target
+            if (_configEditor != null && _configEditor.target == null)
+            {
+                DestroyImmediate(_configEditor);
+                _configEditor = null;
+            }
+
             CreateCachedEditor(configObject, null, ref _configEditor);
-            _configEditor.OnInspectorGUI();
+            
+            // Double check creation succeeded
+            if (_configEditor != null)
+            {
+                _configEditor.OnInspectorGUI();
+            }
         }
 
         private void DrawGenerationButtons()
@@ -89,6 +138,11 @@ namespace SwarmLab.Editor
             // Accessing via manager is faster/easier here since we aren't modifying it
             SerializedProperty drawGizmosProp = serializedObject.FindProperty("drawSpawnZones");
             if (!drawGizmosProp.boolValue) return;
+
+            // --- CHECK SIMULATION MODE ---
+            // If we are in Planar mode, don't draw the Spherical Spawn Handles
+            SerializedProperty simModeProp = serializedObject.FindProperty("simulationMode");
+            if (simModeProp.enumValueIndex == (int)SwarmManager.SimulationMode.Planar) return;
 
             // Create a SerializedObject for the Config Asset
             SerializedObject configSO = new SerializedObject(manager.Config);

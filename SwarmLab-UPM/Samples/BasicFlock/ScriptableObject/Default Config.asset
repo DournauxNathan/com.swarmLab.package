@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SwarmConfig
   speciesConfigs:
   - speciesDefinition: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
-    count: 100
+    count: 600
     spawnRadius: 1
     spawnOffset: {x: 0, y: 0, z: 0}
     steeringRules:
@@ -29,16 +29,22 @@ MonoBehaviour:
       data:
         speciesWeights:
         - species: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
-          weight: 1
+          weight: 1.5
+        neighborRadius: 1
+        maxForce: 1.13
     - rid: 5385356898560639218
       type: {class: CohesionRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
         speciesWeights:
         - species: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
           weight: 1
+        visionRadius: 6.89
+        maxForce: -4.74
     - rid: 5385356898560639219
       type: {class: SeparationRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
         speciesWeights:
         - species: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
           weight: 1
+        minDistance: 3.8
+        maxForce: 0.01

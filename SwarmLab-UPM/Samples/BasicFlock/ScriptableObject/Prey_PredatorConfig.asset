@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0237a3e60404d14897d42c176399b3b, type: 3}
+  m_Name: Prey_PredatorConfig
+  m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SwarmConfig
+  speciesConfigs:
+  - speciesDefinition: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
+    count: 2
+    spawnRadius: 1
+    spawnOffset: {x: 0, y: 0, z: 0}
+    steeringRules:
+    - rid: 5385356902343376960
+  - speciesDefinition: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
+    count: 50
+    spawnRadius: 1
+    spawnOffset: {x: 0, y: 0, z: 0}
+    steeringRules:
+    - rid: 5385356902343376956
+    - rid: 5385356902343376958
+    - rid: 5385356902343376959
+  references:
+    version: 2
+    RefIds:
+    - rid: 5385356902343376956
+      type: {class: SeparationRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights:
+        - species: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
+          weight: 1
+        - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
+          weight: 5
+        minDistance: 2
+        maxForce: 2
+    - rid: 5385356902343376958
+      type: {class: AlignmentRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights:
+        - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
+          weight: 1
+        neighborRadius: 2
+        maxForce: 2
+    - rid: 5385356902343376959
+      type: {class: CohesionRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights:
+        - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
+          weight: 4
+        visionRadius: 2
+        maxForce: 2
+    - rid: 5385356902343376960
+      type: {class: SeparationRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights:
+        - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
+          weight: 4
+        - species: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
+          weight: 1
+        minDistance: 2
+        maxForce: 4.14
