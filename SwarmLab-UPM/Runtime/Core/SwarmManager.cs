@@ -9,6 +9,7 @@ namespace SwarmLab
     {
         public static SwarmManager Instance { get; private set; }
 
+        [SerializeField] private bool drawSpawnZones = true;
         [SerializeField] private SwarmConfig swarmConfig;
         public SwarmConfig Config => swarmConfig;
         
@@ -58,7 +59,7 @@ namespace SwarmLab
             {
                 if (species.speciesDefinition == null || species.speciesDefinition.prefab == null) continue;
 
-                // 1. Create a container for this species (e.g. "Holder_RedAnts")
+                // Create a container for this species (e.g. "Holder_RedAnts")
                 GameObject container = new GameObject($"Holder_{species.speciesDefinition.name}");
                 container.transform.SetParent(this.transform, false);
                 
@@ -66,7 +67,7 @@ namespace SwarmLab
                 Undo.RegisterCreatedObjectUndo(container, "Generate Swarm");
                 #endif
 
-                // 2. Spawn individuals
+                // Spawn individuals
                 for (int i = 0; i < species.count; i++)
                 {
                     // Calculate random position within sphere
@@ -86,7 +87,7 @@ namespace SwarmLab
         
         private void OnDrawGizmos()
         {
-            if (swarmConfig == null || swarmConfig.speciesConfigs == null) return;
+            if (!drawSpawnZones || swarmConfig == null || swarmConfig.speciesConfigs == null) return;
 
             // Draw everything in Local Space (relative to the Manager's rotation/position)
             Matrix4x4 originalMatrix = Gizmos.matrix;

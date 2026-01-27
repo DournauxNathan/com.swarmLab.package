@@ -14,14 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SwarmLab.SwarmConfig
   speciesConfigs:
   - speciesDefinition: {fileID: 11400000, guid: 70d56a53b27020240aa41724879eb1e1, type: 2}
-    count: 1000
-    spawnRadius: 1.9726247
+    count: 500
+    spawnRadius: 7.5
     spawnOffset: {x: -3.56, y: 0, z: 0}
     steeringRules: []
   - speciesDefinition: {fileID: 11400000, guid: fdcb502a37dd94940ad5e6680c6d76a7, type: 2}
     count: 100
-    spawnRadius: 1.6
-    spawnOffset: {x: 3.6439145, y: 0, z: 0.08640909}
+    spawnRadius: 3.2
+    spawnOffset: {x: 0.5694468, y: 0, z: -1.1639066}
+    steeringRules: []
+  - speciesDefinition: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
+    count: 100
+    spawnRadius: 3.38
+    spawnOffset: {x: 3.5214353, y: 0, z: 11.009527}
     steeringRules: []
   references:
     version: 2

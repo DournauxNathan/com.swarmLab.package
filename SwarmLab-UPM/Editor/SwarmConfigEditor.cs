@@ -16,6 +16,11 @@ namespace SwarmLab.Editor
         private SerializedProperty _speciesConfigsProp;
         private List<SpeciesDefinition> _allSpeciesAssets;
 
+        // Constants for consistent layout
+        private const float TOP_PADDING = 4f;
+        private const float BUTTON_HEIGHT = 20f; // Increased slightly for better click area
+        private const float SPACING = 2f;
+
         private void OnEnable()
         {
             _speciesConfigsProp = serializedObject.FindProperty("speciesConfigs");
@@ -25,108 +30,139 @@ namespace SwarmLab.Editor
 
             _speciesList.drawHeaderCallback = (Rect rect) =>
             {
-                // Show count vs max available (e.g. "Population Configuration (2/5)")
-                string header = $"Population Configuration ({_speciesList.count}/{_allSpeciesAssets.Count})";
-                EditorGUI.LabelField(rect, header);
+                int totalAssets = _allSpeciesAssets != null ? _allSpeciesAssets.Count : 0;
+                EditorGUI.LabelField(rect, $"Population Configuration ({_speciesList.count}/{totalAssets})");
             };
 
-            // --- 1. Prevent adding more rows than available assets ---
             _speciesList.onCanAddCallback = (ReorderableList list) =>
             {
+                if (_allSpeciesAssets == null || _allSpeciesAssets.Count == 0) FindAllSpeciesAssets();
                 return list.count < _allSpeciesAssets.Count;
             };
 
-            // --- 2. Custom Add Logic (Avoids copying previous element) ---
             _speciesList.onAddCallback = (ReorderableList list) =>
             {
-                // Add a new empty element
                 int index = list.serializedProperty.arraySize;
                 list.serializedProperty.arraySize++;
-                list.index = index; // Select the new item
+                list.index = index; 
 
                 var newElement = list.serializedProperty.GetArrayElementAtIndex(index);
-
-                // RESET VALUES (Overwrite the copy behavior)
-                // 1. Clear Species Reference
                 newElement.FindPropertyRelative("speciesDefinition").objectReferenceValue = null;
-                
-                // 2. Reset numerical values
                 newElement.FindPropertyRelative("count").intValue = _defaultPopulationCount;
                 newElement.FindPropertyRelative("spawnRadius").floatValue = _defaultSpawnRadius;
 
-                // 3. Clear the inner Rules list (Very important!)
                 var rulesProp = newElement.FindPropertyRelative("steeringRules");
-                if (rulesProp.isArray)
-                {
-                    rulesProp.ClearArray(); 
-                }
+                if (rulesProp.isArray) rulesProp.ClearArray(); 
             };
 
-            // Dynamic height calculation
+            // --- THE FIX: ROBUST HEIGHT CALCULATION ---
             _speciesList.elementHeightCallback = (int index) =>
             {
+                if (index >= _speciesConfigsProp.arraySize) return 0f;
                 var element = _speciesConfigsProp.GetArrayElementAtIndex(index);
-                return EditorGUI.GetPropertyHeight(element, true) + 25f;
+                
+                // Calculate height exactly matching the drawing logic
+                return CalculateElementHeight(element);
             };
 
-            // Drawing the Element
             _speciesList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 var element = _speciesConfigsProp.GetArrayElementAtIndex(index);
                 var speciesDefProp = element.FindPropertyRelative("speciesDefinition");
 
-                rect.y += 4; 
-                rect.height -= 4;
-
-                Rect buttonRect = new Rect(rect.x, rect.y, rect.width, 18);
-                Rect propertiesRect = new Rect(rect.x, rect.y + 22, rect.width, rect.height - 22);
-
-                // Smart Selector Button
+                // Apply Top Padding
+                rect.y += TOP_PADDING; 
+                
+                // 1. Draw the Button
+                Rect buttonRect = new Rect(rect.x, rect.y, rect.width, BUTTON_HEIGHT);
+                
                 SpeciesDefinition currentSpecies = speciesDefProp.objectReferenceValue as SpeciesDefinition;
                 string btnLabel = currentSpecies != null ? currentSpecies.name : "Select Species...";
 
-                // Change button color to red if null (Visual prompt to select something)
                 var prevColor = GUI.backgroundColor;
                 if (currentSpecies == null) GUI.backgroundColor = new Color(1f, 0.7f, 0.7f);
 
                 if (GUI.Button(buttonRect, new GUIContent(btnLabel), EditorStyles.popup))
                 {
+                    FindAllSpeciesAssets(); 
                     ShowSpeciesMenu(speciesDefProp, currentSpecies);
                 }
                 GUI.backgroundColor = prevColor;
 
-                DrawPropertiesExcluding(propertiesRect, element, "speciesDefinition");
+                // 2. Draw the Properties below the button
+                // Move rect down by Button Height + Spacing
+                float currentY = rect.y + BUTTON_HEIGHT + SPACING;
+                
+                // We pass the starting Y so the helper knows where to draw
+                DrawPropertiesExcluding(element, "speciesDefinition", rect.x, currentY, rect.width);
             };
         }
 
-        // ... (Keep your existing ShowSpeciesMenu, FindAllSpeciesAssets, OnInspectorGUI, etc.) ...
-        // ... (They do not need to change) ...
+        // --- NEW HELPER: Strict Height Calculation ---
+        private float CalculateElementHeight(SerializedProperty rootProp)
+        {
+            float height = TOP_PADDING + BUTTON_HEIGHT + SPACING;
 
-        // Just ensuring you have the helper method for reference:
-        private void DrawPropertiesExcluding(Rect rect, SerializedProperty rootProp, string excludeName)
+            SerializedProperty prop = rootProp.Copy();
+            SerializedProperty endProp = rootProp.GetEndProperty();
+
+            // Enter children
+            if (prop.NextVisible(true))
+            {
+                do
+                {
+                    if (SerializedProperty.EqualContents(prop, endProp)) break;
+                    if (prop.name == "speciesDefinition") continue; // We account for this via BUTTON_HEIGHT
+
+                    // Add height of this property
+                    height += EditorGUI.GetPropertyHeight(prop, true);
+                    
+                    // Add spacing between properties
+                    height += SPACING;
+                }
+                while (prop.NextVisible(false));
+            }
+
+            // Add a little bottom padding
+            height += 4f; 
+            
+            return height;
+        }
+
+        // --- NEW HELPER: Strict Drawing ---
+        // Now accepts X, Y, Width explicitly to avoid drift
+        private void DrawPropertiesExcluding(SerializedProperty rootProp, string excludeName, float x, float startY, float width)
         {
             SerializedProperty prop = rootProp.Copy();
             SerializedProperty endProp = rootProp.GetEndProperty();
+            
+            float currentY = startY;
+
             if (prop.NextVisible(true))
             {
                 do
                 {
                     if (SerializedProperty.EqualContents(prop, endProp)) break;
                     if (prop.name == excludeName) continue;
+
                     float h = EditorGUI.GetPropertyHeight(prop, true);
-                    Rect r = new Rect(rect.x, rect.y, rect.width, h);
+                    Rect r = new Rect(x, currentY, width, h);
+                    
                     EditorGUI.PropertyField(r, prop, true);
-                    rect.y += h + 2;
+                    
+                    currentY += h + SPACING;
                 }
                 while (prop.NextVisible(false));
             }
         }
+
+        // ... (Keep ShowSpeciesMenu, FindAllSpeciesAssets, and OnInspectorGUI the same) ...
+        // They are safe.
         
         private void ShowSpeciesMenu(SerializedProperty property, SpeciesDefinition currentSelection)
         {
-             // ... (Keep your existing menu logic) ...
-             // Just remember to keep the logic where we disable items that are already in the list!
-             // Copy-paste your previous ShowSpeciesMenu here.
+             // Copy-paste your existing Menu code here
+             // ...
              GenericMenu menu = new GenericMenu();
              HashSet<SpeciesDefinition> usedSpecies = new HashSet<SpeciesDefinition>();
              for (int i = 0; i < _speciesConfigsProp.arraySize; i++)
@@ -135,6 +171,8 @@ namespace SwarmLab.Editor
                  var def = el.FindPropertyRelative("speciesDefinition").objectReferenceValue as SpeciesDefinition;
                  if (def != null) usedSpecies.Add(def);
              }
+
+             if (_allSpeciesAssets == null) FindAllSpeciesAssets();
 
              foreach (var species in _allSpeciesAssets)
              {
@@ -174,9 +212,10 @@ namespace SwarmLab.Editor
         public override void OnInspectorGUI()
         {
              serializedObject.Update();
+             if (_allSpeciesAssets == null || _allSpeciesAssets.Count == 0) FindAllSpeciesAssets();
              EditorGUILayout.Space();
              EditorGUILayout.LabelField("Swarm Settings", EditorStyles.boldLabel);
-             _speciesList.DoLayoutList();
+             if (_speciesList != null) _speciesList.DoLayoutList();
              serializedObject.ApplyModifiedProperties();
         }
     }

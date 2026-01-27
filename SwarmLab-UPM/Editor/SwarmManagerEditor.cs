@@ -6,26 +6,32 @@ namespace SwarmLab.Editor
     [CustomEditor(typeof(SwarmManager))]
     public class SwarmManagerEditor : UnityEditor.Editor
     {
-        // Cache the editor for the ScriptableObject
         private UnityEditor.Editor _configEditor;
 
         public override void OnInspectorGUI()
         {
-            // 1. Draw the Default Script field (and any other direct fields on Manager)
+            // 1. Synchronize data
             serializedObject.Update();
-            
+
+            // 2. Draw 'drawSpawnZones'
+            SerializedProperty drawGizmosProp = serializedObject.FindProperty("drawSpawnZones");
+            EditorGUILayout.PropertyField(drawGizmosProp);
+
+            // 3. Draw 'swarmConfig'
             SerializedProperty configProp = serializedObject.FindProperty("swarmConfig");
+            
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(configProp);
             if (EditorGUI.EndChangeCheck())
             {
-                // If we changed the config asset, we need to destroy the old cached editor
+                // If config changed, clear the cached editor so it rebuilds next frame
                 if (_configEditor != null) DestroyImmediate(_configEditor);
             }
 
+            // 4. Apply changes to the Manager itself
             serializedObject.ApplyModifiedProperties();
 
-            // 2. Draw the Embedded Inspector
+            // 5. Draw the Embedded Inspector (The "Inner" Editor)
             if (configProp.objectReferenceValue != null)
             {
                 DrawEmbeddedConfigInspector(configProp.objectReferenceValue);
@@ -41,16 +47,12 @@ namespace SwarmLab.Editor
 
         private void DrawEmbeddedConfigInspector(Object configObject)
         {
-            // Draw a visual separator
             EditorGUILayout.Space();
             Rect rect = EditorGUILayout.GetControlRect(false, 1);
             EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1));
             EditorGUILayout.Space();
 
-            // Create or reuse the editor for the ScriptableObject
             CreateCachedEditor(configObject, null, ref _configEditor);
-
-            // Draw it! This invokes the OnInspectorGUI of SwarmConfigEditor
             _configEditor.OnInspectorGUI();
         }
 
@@ -65,7 +67,6 @@ namespace SwarmLab.Editor
                 manager.ClearSwarm();
             }
 
-            // Green "Generate" button
             var oldColor = GUI.backgroundColor;
             GUI.backgroundColor = new Color(0.6f, 1f, 0.6f);
             
@@ -77,19 +78,24 @@ namespace SwarmLab.Editor
             GUI.backgroundColor = oldColor;
             EditorGUILayout.EndHorizontal();
         }
-        
+
         private void OnSceneGUI()
         {
             SwarmManager manager = (SwarmManager)target;
             if (manager.Config == null) return;
 
-            // Create a SerializedObject for the Config Asset so we can record Undos
+            // --- CHECK FOR THE BOOL BEFORE DRAWING HANDLES ---
+            // We need to read the bool from the serialized object or the manager directly
+            // Accessing via manager is faster/easier here since we aren't modifying it
+            SerializedProperty drawGizmosProp = serializedObject.FindProperty("drawSpawnZones");
+            if (!drawGizmosProp.boolValue) return;
+
+            // Create a SerializedObject for the Config Asset
             SerializedObject configSO = new SerializedObject(manager.Config);
             configSO.Update();
 
             SerializedProperty listProp = configSO.FindProperty("speciesConfigs");
 
-            // Loop through each species in the list
             for (int i = 0; i < listProp.arraySize; i++)
             {
                 SerializedProperty element = listProp.GetArrayElementAtIndex(i);
@@ -101,37 +107,29 @@ namespace SwarmLab.Editor
                 string speciesName = defProp.objectReferenceValue != null ? defProp.objectReferenceValue.name : $"Species {i}";
                 Color speciesColor = Color.HSVToRGB((speciesName.GetHashCode() * 0.13f) % 1f, 1f, 1f);
 
-                // --- 1. Coordinate Conversion ---
-                // The data is Local (Offset), but Handles work in World Space.
                 Vector3 worldCenter = manager.transform.TransformPoint(offsetProp.vector3Value);
 
-                // --- 2. Draw Position Handle (Move the Sphere) ---
+                // Draw Position Handle
                 EditorGUI.BeginChangeCheck();
                 Handles.color = speciesColor;
-                
-                // Draw name label above the sphere
-                Handles.Label(worldCenter + Vector3.up * (radiusProp.floatValue + 0.1f), speciesName, EditorStyles.boldLabel);
-
+                Handles.Label(worldCenter + Vector3.up * (radiusProp.floatValue + 1f), speciesName, EditorStyles.boldLabel);
                 Vector3 newWorldCenter = Handles.PositionHandle(worldCenter, manager.transform.rotation);
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    // Convert back to Local Space before saving
                     offsetProp.vector3Value = manager.transform.InverseTransformPoint(newWorldCenter);
                 }
 
-                // --- 3. Draw Radius Handle (Resize the Sphere) ---
+                // Draw Radius Handle
                 EditorGUI.BeginChangeCheck();
-                // RadiusHandle draws a wire sphere with 4 dots on the perimeter
                 float newRadius = Handles.RadiusHandle(manager.transform.rotation, worldCenter, radiusProp.floatValue);
                 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    radiusProp.floatValue = Mathf.Max(0.1f, newRadius); // Prevent negative radius
+                    radiusProp.floatValue = Mathf.Max(0.1f, newRadius);
                 }
             }
 
-            // Write modified values back to the ScriptableObject
             if (configSO.hasModifiedProperties)
             {
                 configSO.ApplyModifiedProperties();
