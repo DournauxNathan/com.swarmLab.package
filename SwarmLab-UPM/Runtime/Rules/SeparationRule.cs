@@ -7,30 +7,58 @@ namespace Runtime.Rules
     [System.Serializable]
     public class SeparationRule : SteeringRule
     {
+        [Tooltip("Distance at which repulsion starts (min_distance)")]
+        public float minDistance = 2.5f; 
+
+        [Tooltip("Maximum force applied for separation")]
+        public float maxForce = 5f;
+
         public override Vector3 CalculateForce(Entity entity, List<Entity> neighbors)
         {
-            if (neighbors.Count == 0) return Vector3.zero;
-
-            Vector3 separationForce = Vector3.zero;
+            Vector3 steer = Vector3.zero;
+            int count = 0;
 
             foreach (var neighbor in neighbors)
             {
-                float weight = GetWeightFor(neighbor.Species);
-                if (weight <= 0.001f) continue;
+                float distance = Vector3.Distance(entity.Position, neighbor.Position);
 
-                Vector3 direction = entity.Position - neighbor.Position;
-                float distanceSq = direction.sqrMagnitude;
-
-                // Avoid division by zero
-                if (distanceSq > 0.0001f)
+                // if 0 < distance < min_distance:
+                if (distance > 0 && distance < minDistance)
                 {
-                    // Weight the repulsion by species importance
-                    // Inverse square law is common for separation
-                    separationForce += (direction.normalized / distanceSq) * weight;
+                    float weight = GetWeightFor(neighbor.Species);
+                    if (weight <= 0.001f) continue;
+
+                    // Vector pointing away from neighbor
+                    Vector3 diff = entity.Position - neighbor.Position;
+                    diff.Normalize();
+
+                    // The closer the neighbor, the stronger the push
+                    diff /= distance;
+
+                    steer += diff * weight;
+                    count++;
                 }
             }
 
-            return separationForce.normalized;
+            if (count > 0)
+            {
+                // steer = steer / count (Average)
+                steer /= count;
+            }
+
+            // Reynolds Steering Logic (Optional but recommended for smoothness)
+            // If you want EXACT Python behavior, you might just return 'steer' here.
+            // But usually for Boids, we apply the steering formula:
+            if (steer.sqrMagnitude > 0)
+            {
+                // Implement Reynolds: Steering = Desired - Velocity
+                steer.Normalize();
+                steer *= entity.Species.maxSpeed;
+                steer -= entity.Velocity;
+                steer = Vector3.ClampMagnitude(steer, maxForce);
+            }
+
+            return steer;
         }
     }
 }

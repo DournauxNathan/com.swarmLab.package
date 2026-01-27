@@ -8,5 +8,8 @@ namespace SwarmLab
     {
         public GameObject prefab;
         public string speciesName;
+        
+        [Header("Behavior Settings")]
+        public float maxSpeed;
     }
 }

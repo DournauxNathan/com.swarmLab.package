@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace SwarmLab
 {
+    [System.Serializable]
     public class Entity
     {
         public SpeciesDefinition Species;

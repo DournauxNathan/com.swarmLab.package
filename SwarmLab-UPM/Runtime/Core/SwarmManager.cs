@@ -23,111 +23,96 @@ namespace SwarmLab
         {
             if (Instance != null) Debug.LogError("SwarmManager is already initialized");
             Instance = this;
-            
-            InitializeRuntimeEntities();
-        }
-        
-        private void InitializeRuntimeEntities()
-        {
-            _entities.Clear();
-            _rulesMap.Clear();
+    
+            // 1. SAFETY: Remove any entities whose GameObjects were deleted manually
+            _entities.RemoveAll(e => e.Transform == null);
 
-            if (swarmConfig == null) return;
-
-            // 1. Build Rule Map from Config
-            foreach (var speciesConfig in swarmConfig.speciesConfigs)
+            // 2. SAFETY: If the list is empty (e.g. first time setup), try to rebuild it
+            // (Optional: if you trust yourself to always click "Generate", you can remove this)
+            if (_entities.Count == 0 && transform.childCount > 0)
             {
-                if (speciesConfig.speciesDefinition != null)
+                // RebuildFromScene(); // Only needed if you want to support manual scene editing
+            }
+
+            // 3. Rebuild the Rule Map (This is still needed because Dictionaries are not serialized!)
+            _rulesMap.Clear();
+            if (swarmConfig != null)
+            {
+                foreach (var speciesConfig in swarmConfig.speciesConfigs)
                 {
-                    if (!_rulesMap.ContainsKey(speciesConfig.speciesDefinition))
+                    if (speciesConfig.speciesDefinition != null && !_rulesMap.ContainsKey(speciesConfig.speciesDefinition))
                     {
-                        // Clone the rules so runtime changes don't affect asset? 
-                        // Or just reference them. For now, reference is fine, but deeper clone might be safer if rules had state. 
-                        // Base rules are stateless or just have weights.
                         _rulesMap.Add(speciesConfig.speciesDefinition, speciesConfig.steeringRules);
                     }
                 }
             }
-
-            // 2. Find existing entities in scene (spawned by GenerateSwarm)
-            // They are children of "Holder_X" GOs.
-            // But we can just search all children of SwarmManager for simplicity or target the holders.
-            // Let's iterate holders as per generation logic.
-            
-            foreach (var speciesConfig in swarmConfig.speciesConfigs)
-            {
-                if (speciesConfig.speciesDefinition == null) continue;
-
-                Transform holder = transform.Find($"Holder_{speciesConfig.speciesDefinition.name}");
-                if (holder != null)
-                {
-                    foreach (Transform child in holder)
-                    {
-                        var entity = new Entity(speciesConfig.speciesDefinition, child);
-                        
-                        // Initialize with zero velocity so they only move if rules are applied
-                        entity.Velocity = Vector3.zero; 
-                        
-                        _entities.Add(entity);
-                    }
-                }
-            }
         }
         
-        #region Temporaire
         private void Update()
         {
-            if (_entities == null || _entities.Count == 0)
-            {
-                Debug.Log("No entities found");
-                return;
-            }
+            if (_entities == null || _entities.Count == 0) return;
 
             float dt = Time.deltaTime;
 
-            // 1. Calculate Forces
+            // --- LOOP 1: CALCULATE FORCES ---
+            // We calculate everyone's desired direction BEFORE moving anyone.
+            // If we moved them while calculating, the last entity would react to 
+            // the "future" position of the first entity, creating jitter.
+            
+            // Note: For 100-300 entities, this O(N^2) loop is fine. 
+            // For 1000+, we would need a spatial grid (optimization for later).
+            
             foreach (var entity in _entities)
             {
-                Vector3 acceleration = Vector3.zero;
+                Vector3 totalAcceleration = Vector3.zero;
 
-                if (_rulesMap.TryGetValue(entity.Species, out var rules) && rules != null)
+                // check if we have rules for this species
+                if (_rulesMap.TryGetValue(entity.Species, out var rules))
                 {
-                    // For now, neighbors = all other entities. 
-                    // Optimization: In real implementation, use spatial partition (Grid/Octree).
-                    // We pass the full list. Rules should ideally handle "self" check or we filter here.
-                    // My implemented rules (Cohesion/Alignment) check weights. 
-                    // If species weights are properly set up (e.g. A reacts to A), it works.
-                    // Implicitly, Cohesion/Alignment loops over 'neighbors'.
-                    
                     foreach (var rule in rules)
                     {
-                        if (rule != null)
-                        {
-                            acceleration += rule.CalculateForce(entity, _entities);
-                        }
+                        if (rule == null) continue;
+                        
+                        // Accumulate the force from this rule
+                        // We pass ALL entities as neighbors for now.
+                        // The Rule is responsible for filtering who is close enough.
+                        Vector3 force = rule.CalculateForce(entity, _entities);
+                        
+                        totalAcceleration += force;
                     }
                 }
+                
+                // Apply acceleration to velocity
+                entity.Velocity += totalAcceleration * dt;
 
-                // Simple Euler Integration
-                entity.Velocity += acceleration * dt;
-                
-                // Clamp Velocity to avoid explosion
-                if (entity.Velocity.sqrMagnitude > 25f) // Max speed 5
+                // LIMIT SPEED (Crucial!)
+                // Without this, they will accelerate infinitely and disappear.
+                float maxSpeed = 5f; // We can expose this in Config later
+                if (entity.Velocity.sqrMagnitude > maxSpeed * maxSpeed)
                 {
-                    entity.Velocity = entity.Velocity.normalized * 5f;
+                    entity.Velocity = entity.Velocity.normalized * maxSpeed;
                 }
-                
-                entity.Position += entity.Velocity * dt;
             }
 
-            // 2. Apply Transform
+            // --- LOOP 2: APPLY MOVEMENT ---
             foreach (var entity in _entities)
             {
+                // Move
+                entity.Position += entity.Velocity * dt;
+
+                // Rotate to face velocity (Visual Polish)
+                // If moving fast enough to have a direction
+                if (entity.Velocity.sqrMagnitude > 0.1f)
+                {
+                     Quaternion targetRotation = Quaternion.LookRotation(entity.Velocity);
+                     // Smooth rotation looks better than instant snapping
+                     entity.Transform.rotation = Quaternion.Slerp(entity.Transform.rotation, targetRotation, dt * 5f);
+                }
+
+                // Apply to Unity Transform
                 entity.UpdateTransform();
             }
         }
-        #endregion
-        
         // --- EDITOR TOOLS ---
 
         public void ClearSwarm()
@@ -149,35 +134,43 @@ namespace SwarmLab
         public void GenerateSwarm()
         {
             if (swarmConfig == null) return;
-            
+    
             ClearSwarm();
+    
+            // 1. Clear the brain list immediately so we can refill it
+            _entities.Clear();
 
             foreach (var species in swarmConfig.speciesConfigs)
             {
                 if (species.speciesDefinition == null || species.speciesDefinition.prefab == null) continue;
 
-                // Create a container for this species (e.g. "Holder_RedAnts")
                 GameObject container = new GameObject($"Holder_{species.speciesDefinition.name}");
                 container.transform.SetParent(this.transform, false);
-                
-                #if UNITY_EDITOR
+        
+#if UNITY_EDITOR
                 Undo.RegisterCreatedObjectUndo(container, "Generate Swarm");
-                #endif
+#endif
 
-                // Spawn individuals
                 for (int i = 0; i < species.count; i++)
                 {
-                    // Calculate random position within sphere
                     Vector3 randomPos = species.spawnOffset + (Random.insideUnitSphere * species.spawnRadius);
-                    
-                    // Instantiate Prefab
+            
                     GameObject go = Instantiate(species.speciesDefinition.prefab, container.transform);
-                    go.transform.localPosition = randomPos; // Local position relative to Manager
+                    go.transform.localPosition = randomPos;
                     go.name = $"{species.speciesDefinition.name}_{i}";
 
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     Undo.RegisterCreatedObjectUndo(go, "Spawn Entity");
-                    #endif
+#endif
+
+                    // --- OPTIMIZATION: Create and Add Entity Here ---
+                    Entity newEntity = new Entity(species.speciesDefinition, go.transform);
+            
+                    // Apply the Physics Kick immediately
+                    newEntity.Velocity = Random.onUnitSphere * 2f; 
+            
+                    // Add to the main list
+                    _entities.Add(newEntity);
                 }
             }
         }
