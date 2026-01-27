@@ -27,6 +27,7 @@ namespace SwarmLab
         
         protected virtual void InitializeMap()
         {
+            if (WeightMap == null) WeightMap = new Dictionary<SpeciesDefinition, float>();
             WeightMap.Clear();
             foreach (var sw in speciesWeights)
             {
@@ -41,6 +42,9 @@ namespace SwarmLab
         // Helper to get weight
         protected float GetWeightFor(SpeciesDefinition species)
         {
+            // Safety check: if Map is null (due to serialization quirks), re-init
+            if (WeightMap == null) _isInitialized = false;
+
             if (!_isInitialized) InitializeMap();
             
             if (species != null && WeightMap.TryGetValue(species, out float val))

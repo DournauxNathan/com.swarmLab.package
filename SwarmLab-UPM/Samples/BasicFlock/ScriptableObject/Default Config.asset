@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0237a3e60404d14897d42c176399b3b, type: 3}
+  m_Name: Default Config
+  m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SwarmConfig
+  speciesConfigs:
+  - speciesDefinition: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
+    count: 100
+    spawnRadius: 1
+    spawnOffset: {x: 0, y: 0, z: 0}
+    steeringRules:
+    - rid: 5385356898560639217
+    - rid: 5385356898560639218
+    - rid: 5385356898560639219
+  references:
+    version: 2
+    RefIds:
+    - rid: 5385356898560639217
+      type: {class: AlignmentRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights:
+        - species: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
+          weight: 1
+    - rid: 5385356898560639218
+      type: {class: CohesionRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights:
+        - species: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
+          weight: 1
+    - rid: 5385356898560639219
+      type: {class: SeparationRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights:
+        - species: {fileID: 11400000, guid: c90a361a36344744799b5e194fa91483, type: 2}
+          weight: 1
