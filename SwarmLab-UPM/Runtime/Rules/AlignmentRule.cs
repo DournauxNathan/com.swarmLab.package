@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Runtime.Rules
 {
+    [System.Serializable]
     public class AlignmentRule : SteeringRule
     {
         public override Vector3 CalculateForce(Entity entity, List<Entity> neighbors)
