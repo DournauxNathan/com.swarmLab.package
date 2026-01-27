@@ -204,6 +204,12 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.xaxam.swarmlab": {
+      "version": "file:C:/Users/natha/Documents/SwarmLab/SwarmLab-UPM",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
       "depth": 0,
