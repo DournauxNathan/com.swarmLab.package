@@ -204,6 +204,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.xaxam.swarmlab": {
+      "version": "https://github.com/xaxam2001/SwarmLab.git?path=/SwarmLab-UPM",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ec28b8e7c4ae28022a72fe21878280f98c70c339"
+    },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
       "depth": 0,
