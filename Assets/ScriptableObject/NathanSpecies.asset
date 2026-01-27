@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0237a3e60404d14897d42c176399b3b, type: 3}
-  m_Name: NewSwarmConfig
-  m_EditorClassIdentifier: Assembly-CSharp::SwarmLab.SwarmConfig
-  speciesConfigs: []
-  references:
-    version: 2
-    RefIds: []
+  m_Script: {fileID: 11500000, guid: 032b686db9de64f44bfa4a63bc80d000, type: 3}
+  m_Name: NathanSpecies
+  m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SpeciesDefinition
+  prefab: {fileID: 0}
+  speciesName: Nathan
