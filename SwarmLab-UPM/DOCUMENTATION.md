@@ -58,6 +58,7 @@ The `SwarmConfig` asset defines *who* is in the swarm.
    <p align="center">
   <img src="Documentation~/create-species-so.gif" width="1396" alt="Create Species Definition" />
 </p>
+
    - **Prefab**: Assign the GameObject to spawn.
    - **Species Name**: The unique identifier for this species (used in rules).
    - **Max Speed**: The absolute speed limit for entities of this species.
