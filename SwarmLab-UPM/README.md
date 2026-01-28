@@ -25,8 +25,10 @@ If you want to modify the package source code:
 5. Select **"Add package from disk..."**.
 6. Select the `package.json` file inside the `SwarmLab-UP` folder you just copied.
 
+
 ## Requirements
 - **Unity Version**: 6000.2 or higher.
+
 
 Documentation
 ---
