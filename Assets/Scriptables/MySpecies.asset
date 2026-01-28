@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 032b686db9de64f44bfa4a63bc80d000, type: 3}
-  m_Name: MaximeSpecie
+  m_Name: MySpecies
   m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SpeciesDefinition
-  prefab: {fileID: 3217801591169989818, guid: 0a87ca5613b06484f895138c9da5175c, type: 3}
-  speciesName: Maxime
-  maxSpeed: 7.5
+  prefab: {fileID: 3217801591169989818, guid: 4a0b5ab31e63b964e82498bd642d5f05, type: 3}
+  speciesName: My Little Specie
+  maxSpeed: 50

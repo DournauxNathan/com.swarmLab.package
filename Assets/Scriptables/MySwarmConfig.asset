@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0237a3e60404d14897d42c176399b3b, type: 3}
+  m_Name: MySwarmConfig
+  m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SwarmConfig
+  speciesConfigs:
+  - speciesDefinition: {fileID: 11400000, guid: ebc16f5589b4d5f478a120964b807c98, type: 2}
+    count: 150
+    spawnRadius: 24.336418
+    spawnOffset: {x: 0, y: 0, z: 0}
+    steeringRules:
+    - rid: 5385356918512943294
+    - rid: 5385356918512943295
+    - rid: 5385356918512943296
+    - rid: 5385356918512943298
+  references:
+    version: 2
+    RefIds:
+    - rid: 5385356918512943294
+      type: {class: AlignmentRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights: []
+        neighborRadius: 50
+        maxForce: 2
+    - rid: 5385356918512943295
+      type: {class: CohesionRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights: []
+        visionRadius: 50
+        maxForce: 2
+    - rid: 5385356918512943296
+      type: {class: SeparationRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights: []
+        minDistance: 2
+        maxForce: 2
+    - rid: 5385356918512943298
+      type: {class: BoundingBoxRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
+      data:
+        speciesWeights: []
+        center: {x: 0, y: 0, z: 0}
+        size: {x: 50, y: 50, z: 50}
+        edgeThreshold: 5
+        maxForce: 10
