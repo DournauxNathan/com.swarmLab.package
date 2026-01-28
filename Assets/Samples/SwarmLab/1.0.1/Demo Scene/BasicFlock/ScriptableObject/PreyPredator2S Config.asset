@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SwarmLab.SwarmConfig
   speciesConfigs:
   - speciesDefinition: {fileID: 11400000, guid: fdcb502a37dd94940ad5e6680c6d76a7, type: 2}
-    count: 5
+    count: 20
     spawnRadius: 2.8712845
     spawnOffset: {x: 9.308389, y: 0, z: 9.023289}
     steeringRules:
@@ -24,12 +24,12 @@ MonoBehaviour:
     - rid: 1757164237908869232
   - speciesDefinition: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
     count: 100
-    spawnRadius: 7.9655914
-    spawnOffset: {x: 6.782728, y: 0, z: -4.004818}
+    spawnRadius: 7.479646
+    spawnOffset: {x: 1.8228953, y: 0, z: 2.3992887}
     steeringRules:
+    - rid: 1757164237908869229
     - rid: 1757164237908869234
     - rid: 1757164237908869235
-    - rid: 1757164237908869229
     - rid: 1757164237908869233
   references:
     version: 2
@@ -37,80 +37,68 @@ MonoBehaviour:
     - rid: 1757164237908869226
       type: {class: CohesionRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
-        maxForce: 2
-        speciesParams:
+        speciesWeights:
         - species: {fileID: 11400000, guid: fdcb502a37dd94940ad5e6680c6d76a7, type: 2}
-          weight: 0.5
-          visionRadius: 5
+          weight: 1
         - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
           weight: 1.5
-          visionRadius: 10
+        visionRadius: 6
+        maxForce: 5
     - rid: 1757164237908869227
       type: {class: AlignmentRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
-        maxForce: 2
-        speciesParams:
+        speciesWeights:
         - species: {fileID: 11400000, guid: fdcb502a37dd94940ad5e6680c6d76a7, type: 2}
           weight: 1
-          visionRadius: 5
-        - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
-          weight: 0
-          visionRadius: 5
+        neighborRadius: 5
+        maxForce: 2
     - rid: 1757164237908869228
       type: {class: SeparationRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
-        speciesParams:
+        speciesWeights:
         - species: {fileID: 11400000, guid: fdcb502a37dd94940ad5e6680c6d76a7, type: 2}
           weight: 1.5
-          minDistance: 1.5
-        - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
-          weight: 0
-          minDistance: 10
+        minDistance: 1.5
         maxForce: 5
     - rid: 1757164237908869229
       type: {class: SeparationRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
-        speciesParams:
+        speciesWeights:
         - species: {fileID: 11400000, guid: fdcb502a37dd94940ad5e6680c6d76a7, type: 2}
           weight: 4
-          minDistance: 5
         - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
-          weight: 0.5
-          minDistance: 0.5
-        maxForce: 8
+          weight: 0.8
+        minDistance: 2
+        maxForce: 10
     - rid: 1757164237908869232
       type: {class: BoundingBoxRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
+        speciesWeights: []
         center: {x: 0, y: 0, z: 0}
-        size: {x: 35, y: 20, z: 35}
-        edgeThreshold: 4
-        maxForce: 50
+        size: {x: 30, y: 20, z: 30}
+        edgeThreshold: 2
+        maxForce: 10
     - rid: 1757164237908869233
       type: {class: BoundingBoxRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
+        speciesWeights: []
         center: {x: 0, y: 0, z: 0}
-        size: {x: 35, y: 20, z: 35}
-        edgeThreshold: 4
-        maxForce: 50
+        size: {x: 30, y: 20, z: 30}
+        edgeThreshold: 2
+        maxForce: 10
     - rid: 1757164237908869234
       type: {class: CohesionRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
-        maxForce: 2
-        speciesParams:
-        - species: {fileID: 11400000, guid: fdcb502a37dd94940ad5e6680c6d76a7, type: 2}
-          weight: 0
-          visionRadius: 0
+        speciesWeights:
         - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
           weight: 1
-          visionRadius: 6
+        visionRadius: 4
+        maxForce: 5
     - rid: 1757164237908869235
       type: {class: AlignmentRule, ns: Runtime.Rules, asm: SwarmLab.Runtime}
       data:
-        maxForce: 2
-        speciesParams:
-        - species: {fileID: 11400000, guid: fdcb502a37dd94940ad5e6680c6d76a7, type: 2}
-          weight: 0
-          visionRadius: 0
+        speciesWeights:
         - species: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
           weight: 1
-          visionRadius: 4
+        neighborRadius: 4
+        maxForce: 5

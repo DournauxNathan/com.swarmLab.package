@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 032b686db9de64f44bfa4a63bc80d000, type: 3}
+  m_Name: Human
+  m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SpeciesDefinition
+  prefab: {fileID: 7057885896351734653, guid: 4b84f6e86e0970a48a53010e4eba3900, type: 3}
+  speciesName: Human
+  maxSpeed: 10
