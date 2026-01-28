@@ -40,6 +40,7 @@ The `SwarmConfig` asset defines *who* is in the swarm.
 2. Navigate to **Create > SwarmLab > Swarm Config**.
 ![Create Swarm Config](Documentation~/create-swarmConfig-so.gif)
 3. In the Inspector, you can add "Species Configs".
+
 ![Configure Swarm Config](Documentation~/config-swarmConfig-so.gif)
 4. For each species, assign a **Species Definition**.
    - You can add **Steering Rules** to each species configuration to define their behavior (e.g., Alignment, Cohesion).
