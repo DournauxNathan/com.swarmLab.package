@@ -1,12 +1,18 @@
 # SwarmLab
-Swarm Flight Simulation for Runtime and Editor. 
-Modular, and reliable. 
-Offers adjustable Cohesion, Alignment, and Separation.
 
+## Overview
+**SwarmLab** is a modular and reliable Unity package designed for simulating complex swarm behaviors like flocking, schooling, and leader following. It operates effectively in **Runtime**, offering a flexible rule-based system.
 
-System Requirements
----
-Unity 6000.2 or later versions.
+![Demo of the sample project](SwarmLab-UPM/Documentation~/on-validate-changes-at-runtime.gif)
+
+### Key Features
+- **Adjustable Behaviors**: Fine-tune Cohesion, Alignment, and Separation forces.
+- **Multi-Species Support**: Create complex ecosystems where different species interacting with custom weights.
+- **Dual Simulation Modes**: seamless support for **Volumetric (3D)** and **Planar (2D)** environments.
+- **Extensible Architecture**: Easily add custom `SteeringRule` classes to define unique behaviors.
+
+## System Requirements
+- **Unity Version**: 6000.2 or later.
 
 
 ## Installation instructions
@@ -14,7 +20,7 @@ Unity 6000.2 or later versions.
 1. Open the Unity Package Manager.
 2. Click the `+` button in the top left.
 3. Select "Add package from git URL..."
-4. Paste the following URL: `https://github.com/xaxam2001/SwarmLab.git?path=/SwarmLab-UP`
+4. Paste the following URL: `https://github.com/xaxam2001/SwarmLab.git?path=/SwarmLab-UPM`
 
 ### Via Source Code (Local)
 If you want to modify the package source code:
@@ -25,10 +31,7 @@ If you want to modify the package source code:
 5. Select **"Add package from disk..."**.
 6. Select the `package.json` file inside the `SwarmLab-UP` folder you just copied.
 
-## Requirements
-- **Unity Version**: 6000.2 or higher.
 
 Documentation
 ---
-See [Documentation](SwarmLab-UPM/DOCUMENTATION.md) for full details on workflows, configuration.
-
+See [Documentation](Documentation.md) for full details on workflows, configuration.
