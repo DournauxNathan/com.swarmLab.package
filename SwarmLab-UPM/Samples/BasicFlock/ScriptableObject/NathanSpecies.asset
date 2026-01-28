@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SpeciesDefinition
   prefab: {fileID: 9112159106191103563, guid: 1fb164963410bf6488ffa4e507180104, type: 3}
   speciesName: Nathan
-  maxSpeed: 10
+  maxSpeed: 15

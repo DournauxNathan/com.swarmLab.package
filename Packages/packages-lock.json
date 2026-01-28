@@ -204,7 +204,7 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.xaxam.swarmlab": {
+    "com.xaxamkodatsu.swarmlab": {
       "version": "file:../SwarmLab-UPM",
       "depth": 0,
       "source": "local",

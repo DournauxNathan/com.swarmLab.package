@@ -1,83 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 namespace SwarmLab
 {
-    // A simple struct to map Species -> Value in the Inspector
+    // The base "Contract" for per-species settings
     [System.Serializable]
-    public struct SpeciesWeight
+    public class SpeciesParams
     {
-        public SpeciesDefinition species;
-        public float weight;
+        [HideInInspector] public SpeciesDefinition species; // The "Key"
+        // (Add your custom fields in the child classes)
     }
 
     [System.Serializable]
     public abstract class SteeringRule
     {
-        [Header("Species Interactions")]
-        [Tooltip("Define specific weights for specific species here.")]
-        public List<SpeciesWeight> speciesWeights = new List<SpeciesWeight>();
-
-        // Cache for runtime lookup (Dictionaries are faster than iterating lists every frame)
-        protected Dictionary<SpeciesDefinition, float> WeightMap = new Dictionary<SpeciesDefinition, float>();
-        private bool _isInitialized = false;
+        // The Editor calls this to keep the lists in sync
+        public abstract void SyncSpeciesList(List<SpeciesDefinition> allSpecies);
 
         public abstract Vector3 CalculateForce(Entity entity, List<Entity> neighbors);
         
-        protected virtual void InitializeMap()
-        {
-            if (WeightMap == null) WeightMap = new Dictionary<SpeciesDefinition, float>();
-            WeightMap.Clear();
-            foreach (var sw in speciesWeights)
-            {
-                if (sw.species != null && !WeightMap.ContainsKey(sw.species))
-                {
-                    WeightMap.Add(sw.species, sw.weight);
-                }
-            }
-            _isInitialized = true;
-        }
-
-        // Helper to get weight
-        protected float GetWeightFor(SpeciesDefinition species)
-        {
-            // Safety check: if Map is null (due to serialization quirks), re-init
-            if (WeightMap == null) _isInitialized = false;
-
-            if (!_isInitialized) InitializeMap();
-            
-            if (species != null && WeightMap.TryGetValue(species, out float val))
-            {
-                return val;
-            }
-            return 0f; // Default weight if not found
-        }
-
-        public virtual void OnValidate()
-        {
-            _isInitialized = false; 
-        }
-
-        // helper method to check for errors without deleting data.
-        public string GetValidationWarning()
-        {
-            if (speciesWeights == null) return null;
-
-            // Check if we have duplicate definitions
-            var duplicates = speciesWeights
-                .Where(sw => sw.species != null)
-                .GroupBy(sw => sw.species)
-                .Where(g => g.Count() > 1)
-                .Select(g => g.Key.name)
-                .ToList();
-
-            if (duplicates.Count > 0)
-            {
-                return $"Duplicate species found: {string.Join(", ", duplicates)}";
-            }
-
-            return null; // No warning
-        }
+        public virtual void OnValidate() { }
     }
 }

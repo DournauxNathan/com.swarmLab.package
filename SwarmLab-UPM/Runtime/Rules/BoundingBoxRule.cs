@@ -17,6 +17,12 @@ namespace Runtime.Rules
         [Tooltip("Max force to push them back in")]
         public float maxForce = 10f;
 
+        // Since this rule doesn't have per-species settings, 
+        // we just leave this method empty.
+        public override void SyncSpeciesList(List<SpeciesDefinition> allSpecies)
+        {
+        }
+
         public override Vector3 CalculateForce(Entity entity, List<Entity> neighbors)
         {
             Vector3 position = entity.Position;
@@ -51,10 +57,6 @@ namespace Runtime.Rules
             Vector3 steer = desired - entity.Velocity;
             steer = Vector3.ClampMagnitude(steer, maxForce);
 
-            // Note: We typically don't multiply this by Species Weight 
-            // because the wall doesn't care what species you are. 
-            // But we DO multiply by the Rule Weight (Global).
-            
             return steer;
         }
     }

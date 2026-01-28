@@ -7,30 +7,67 @@ namespace Runtime.Rules
     [System.Serializable]
     public class AlignmentRule : SteeringRule
     {
-        [Tooltip("Distance to see neighbors")]
-        public float neighborRadius = 50; // 
-
+        [System.Serializable]
+        public class Params : SpeciesParams
+        {
+            public float weight = 1f;       // Custom weight
+            public float visionRadius = 10f; // Custom vision radius
+        }
+        
         [Tooltip("Maximum steering force")]
         public float maxForce = 2f;
+        
+        public List<Params> speciesParams = new List<Params>();
+
+        // Cache for fast lookup
+        private Dictionary<SpeciesDefinition, Params> _cache;
+
+        public override void SyncSpeciesList(List<SpeciesDefinition> allSpecies)
+        {
+            // 1. Add missing species
+            foreach (var def in allSpecies)
+            {
+                if (!speciesParams.Exists(p => p.species == def))
+                {
+                    speciesParams.Add(new Params { species = def });
+                }
+            }
+            // 2. Remove deleted species
+            speciesParams.RemoveAll(p => p.species == null || !allSpecies.Contains(p.species));
+            _cache = null; // Force rebuild
+        }
 
         public override Vector3 CalculateForce(Entity entity, List<Entity> neighbors)
         {
+            // Build Cache if needed
+            if (_cache == null)
+            {
+                _cache = new Dictionary<SpeciesDefinition, Params>();
+                foreach (var p in speciesParams) if (p.species != null) _cache[p.species] = p;
+            }
+            
             Vector3 sum = Vector3.zero;
             float totalWeight = 0f;
             int count = 0;
 
             foreach (var neighbor in neighbors)
             {
-                float distance = Vector3.Distance(entity.Position, neighbor.Position);
+                
+                if (neighbor == entity) continue;
 
-                if (distance > 0 && distance < neighborRadius)
+                // We check if we have params for this neighbor's species
+                if (_cache.TryGetValue(neighbor.Species, out Params p))
                 {
-                    float weight = GetWeightFor(neighbor.Species);
-                    if (weight <= 0.001f) continue;
+                    if (p.weight <= 0) continue; 
+                    
+                    float distance = Vector3.Distance(entity.Position, neighbor.Position);
 
-                    sum += neighbor.Velocity * weight;
-                    totalWeight += weight;
-                    count++;
+                    if (distance > 0 && distance < p.visionRadius)
+                    {
+                        sum += neighbor.Velocity * p.weight;
+                        totalWeight += p.weight;
+                        count++;
+                    }
                 }
             }
 

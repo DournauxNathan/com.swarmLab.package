@@ -7,53 +7,79 @@ namespace Runtime.Rules
     [System.Serializable]
     public class CohesionRule : SteeringRule
     {
-        [Tooltip("Distance maximum pour voir les voisins")]
-        public float visionRadius = 50; // 
+        [System.Serializable]
+        public class Params : SpeciesParams
+        {
+            public float weight = 1f;       // Custom Field 1
+            public float visionRadius = 10f; // Custom Field 2
+        }
 
-        [Tooltip("Force maximum de virage")]
-        public float maxForce = 2f; 
+        [Tooltip("Maximum steering force")]
+        public float maxForce = 2f;
+        
+        // Params per Species
+        public List<Params> speciesParams = new List<Params>();
+
+        // Cache for fast lookup
+        private Dictionary<SpeciesDefinition, Params> _cache;
+
+        // --- C. Sync Logic (The Base Class Contract) ---
+        public override void SyncSpeciesList(List<SpeciesDefinition> allSpecies)
+        {
+            // 1. Add missing species
+            foreach (var def in allSpecies)
+            {
+                if (!speciesParams.Exists(p => p.species == def))
+                {
+                    speciesParams.Add(new Params { species = def });
+                }
+            }
+            // 2. Remove deleted species
+            speciesParams.RemoveAll(p => p.species == null || !allSpecies.Contains(p.species));
+            _cache = null; // Force rebuild
+        }
 
         public override Vector3 CalculateForce(Entity entity, List<Entity> neighbors)
         {
-            Vector3 centerOfMass = Vector3.zero;
-            float totalWeight = 0f;
-            int count = 0;
-
-            foreach (var neighbor in neighbors)
+            // Build Cache if needed
+            if (_cache == null)
             {
-                if (neighbor == entity) continue;
-
-                float distance = Vector3.Distance(entity.Position, neighbor.Position);
-                
-                if (distance > 0 && distance < visionRadius)
-                {
-                    float weight = GetWeightFor(neighbor.Species);
-                    if (weight <= 0.001f) continue;
-
-                    centerOfMass += neighbor.Position * weight;
-                    totalWeight += weight;
-                    count++;
-                }
+                _cache = new Dictionary<SpeciesDefinition, Params>();
+                foreach (var p in speciesParams) if (p.species != null) _cache[p.species] = p;
             }
 
-            if (count == 0) return Vector3.zero;
+            Vector3 center = Vector3.zero;
+            float totalWeight = 0f;
 
-            // 1. Calculate weighted center
-            centerOfMass /= totalWeight;
+            foreach (var n in neighbors)
+            {
+                if (n == entity) continue;
+
+                // We check if we have params for this neighbor's species
+                if (_cache.TryGetValue(n.Species, out Params p))
+                {
+                    if (p.weight <= 0) continue; 
+                    
+                    float dist = Vector3.Distance(entity.Position, n.Position);
+                    
+                    // We can check specific radius for THIS species!
+                    if (dist < p.visionRadius) 
+                    {
+                        center += n.Position * p.weight;
+                        totalWeight += p.weight;
+                    }
+                }
+            }
             
-            // 2. Calculate the Average Weight of the group
-            // If all neighbors had weight 0.5, averageWeight is 0.5
-            float averageWeight = totalWeight / count;
-
-            // Reynolds Steering
-            Vector3 desired = centerOfMass - entity.Position;
-            desired = desired.normalized * entity.Species.maxSpeed;
-
-            Vector3 steer = desired - entity.Velocity;
-            steer = Vector3.ClampMagnitude(steer, maxForce);
-
-            // 3. APPLY WEIGHT: Scale the final force by the species importance
-            return steer * averageWeight; 
+            if (totalWeight > 0)
+            {
+                center /= totalWeight;
+                Vector3 desired = (center - entity.Position).normalized * entity.Species.maxSpeed;
+                Vector3 steer = Vector3.ClampMagnitude(desired - entity.Velocity, maxForce); 
+                return steer;
+            }
+            
+            return Vector3.zero;
         }
     }
 }

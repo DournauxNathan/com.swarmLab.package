@@ -246,7 +246,7 @@ namespace SwarmLab
         
         private void OnDrawGizmos()
         {
-            if (!drawSpawnZones || swarmConfig == null || swarmConfig.speciesConfigs == null) return;
+            if (swarmConfig == null || swarmConfig.speciesConfigs == null) return;
 
             // Draw everything in Local Space (relative to the Manager's rotation/position)
             Matrix4x4 originalMatrix = Gizmos.matrix;
@@ -259,17 +259,20 @@ namespace SwarmLab
                 {
                     if (species.speciesDefinition == null) continue;
 
-                    // Generate a consistent color based on the species name
-                    Color speciesColor = Color.HSVToRGB((species.speciesDefinition.name.GetHashCode() * 0.13f) % 1f,
-                        0.7f, 1f);
-                    Gizmos.color = speciesColor;
+                    if (drawSpawnZones)
+                    {
+                        // Generate a consistent color based on the species name
+                        Color speciesColor = Color.HSVToRGB((species.speciesDefinition.name.GetHashCode() * 0.13f) % 1f,
+                            0.7f, 1f);
+                        Gizmos.color = speciesColor;
 
-                    Gizmos.DrawWireSphere(species.spawnOffset, species.spawnRadius);
+                        Gizmos.DrawWireSphere(species.spawnOffset, species.spawnRadius);
 
-                    // Draw a small solid sphere at the center of the zone
-                    Gizmos.color = new Color(speciesColor.r, speciesColor.g, speciesColor.b, 0.4f);
-                    Gizmos.DrawSphere(species.spawnOffset, 0.05f);
-
+                        // Draw a small solid sphere at the center of the zone
+                        Gizmos.color = new Color(speciesColor.r, speciesColor.g, speciesColor.b, 0.4f);
+                        Gizmos.DrawSphere(species.spawnOffset, 0.05f);
+                    }
+                    
                     foreach (var rule in species.steeringRules)
                     {
                         if (rule is Runtime.Rules.BoundingBoxRule boxRule)

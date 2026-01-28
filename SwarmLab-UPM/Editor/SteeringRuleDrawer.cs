@@ -1,7 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SwarmLab.Editor
@@ -11,209 +9,226 @@ namespace SwarmLab.Editor
     {
         private const float ROW_HEIGHT = 20f;
         private const float HEADER_HEIGHT = 22f;
-        private const float PADDING = 6f; 
-        private const float FIELD_SPACING = 2f; // Space between standard fields
+        private const float PADDING = 8f;
+        private const float RULE_PADDING = 16f;
 
-        // --- 1. Calculate Dynamic Height ---
+        // How much width the Species Name gets (30%)
+        private const float NAME_WIDTH_PCT = 0.3f; 
+
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            if (property.managedReferenceValue == null) 
-                return EditorGUIUtility.singleLineHeight;
+            if (property.managedReferenceValue == null) return EditorGUIUtility.singleLineHeight;
 
-            // Start with Header height
             float height = EditorGUIUtility.singleLineHeight + PADDING;
 
-            // A. Calculate height of Standard Fields (minDistance, maxForce, etc.)
-            SerializedProperty iterator = property.Copy();
-            SerializedProperty endProp = iterator.GetEndProperty();
-
-            // Enter the children of the class
-            if (iterator.NextVisible(true)) 
+            // 1. Standard Fields (Global Rule Settings)
+            var iterator = property.Copy();
+            var endProp = iterator.GetEndProperty();
+            if (iterator.NextVisible(true))
             {
                 do
                 {
                     if (SerializedProperty.EqualContents(iterator, endProp)) break;
-
-                    // Skip the 'speciesWeights' list because we draw that manually later
-                    if (iterator.name == "speciesWeights") continue;
-
-                    // Add the height of this specific field (e.g. float, Vector3, etc.)
-                    height += EditorGUI.GetPropertyHeight(iterator, true) + FIELD_SPACING;
-                }
-                while (iterator.NextVisible(false));
+                    if (iterator.name == "speciesParams") continue; // Skip the list
+                    height += EditorGUI.GetPropertyHeight(iterator, true) + 2f;
+                } while (iterator.NextVisible(false));
             }
 
-            // B. Calculate height of the Species Table
-            height += PADDING; // Space before table
-            var speciesList = GetSpeciesFromConfig(property.serializedObject);
-            
-            if (speciesList.Count > 0)
-                height += HEADER_HEIGHT + (speciesList.Count * ROW_HEIGHT);
-            else
-                height += ROW_HEIGHT;
+            // 2. The Table Height
+            SerializedProperty listProp = property.FindPropertyRelative("speciesParams");
+            if (listProp != null && listProp.isArray)
+            {
+                int count = listProp.arraySize;
+                // Header + Rows
+                height += PADDING + HEADER_HEIGHT + (count * ROW_HEIGHT);
+            }
 
             return height;
         }
 
-        // --- 2. Draw the Inspector ---
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
+            
+            Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight + RULE_PADDING);
 
-            Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-
-            // Handle Null Case (New Rule Button)
+            // Handle "Add Rule" Button
             if (property.managedReferenceValue == null)
             {
                 EditorGUI.LabelField(currentRect, label);
-                Rect buttonRect = new Rect(position.x + EditorGUIUtility.labelWidth, position.y, position.width - EditorGUIUtility.labelWidth, position.height);
-                if (GUI.Button(buttonRect, "Add Rule...")) ShowTypeSelector(property);
+                Rect btnRect = new Rect(position.x + EditorGUIUtility.labelWidth, position.y, position.width - EditorGUIUtility.labelWidth, position.height);
+                if (GUI.Button(btnRect, "Add Rule...")) ShowTypeSelector(property);
                 EditorGUI.EndProperty();
                 return;
             }
 
             // Draw Rule Title
             string typeName = property.managedReferenceValue.GetType().Name;
-            EditorGUI.LabelField(currentRect, $"{label.text} ({typeName})", EditorStyles.boldLabel);
+            EditorGUI.LabelField(currentRect, $"{typeName}", EditorStyles.boldLabel);
             currentRect.y += EditorGUIUtility.singleLineHeight + PADDING;
 
-            // --- A. DRAW STANDARD FIELDS ---
-            // Iterate through properties again to Draw them
-            SerializedProperty iterator = property.Copy();
-            SerializedProperty endProp = iterator.GetEndProperty();
-
+            // --- 1. Draw Global Fields (ruleWeight, etc) ---
+            var iterator = property.Copy();
+            var endProp = iterator.GetEndProperty();
             if (iterator.NextVisible(true))
             {
                 do
                 {
                     if (SerializedProperty.EqualContents(iterator, endProp)) break;
-                    
-                    // Skip the table list
-                    if (iterator.name == "speciesWeights") continue;
+                    if (iterator.name == "speciesParams") continue;
 
                     float h = EditorGUI.GetPropertyHeight(iterator, true);
                     currentRect.height = h;
-
-                    // Draw the field (e.g. minDistance)
                     EditorGUI.PropertyField(currentRect, iterator, true);
-                    
-                    currentRect.y += h + FIELD_SPACING;
-                }
-                while (iterator.NextVisible(false));
+                    currentRect.y += h + 2f;
+                } while (iterator.NextVisible(false));
             }
 
-            // --- B. DRAW SPECIES TABLE ---
-            currentRect.y += PADDING; 
-            
-            SteeringRule rule = property.managedReferenceValue as SteeringRule;
-            var availableSpecies = GetSpeciesFromConfig(property.serializedObject);
-            
-            if (availableSpecies.Count > 0)
+            // --- 2. Draw Dynamic Table ---
+            SerializedProperty listProp = property.FindPropertyRelative("speciesParams");
+            if (listProp != null)
             {
-                // Draw Header
+                currentRect.y += PADDING;
+                
+                // A. Sync List (Ensure rows match the Config)
+                var rule = property.managedReferenceValue as SteeringRule;
+                var config = GetConfigFromObject(property.serializedObject);
+                if (rule != null && config != null) 
+                {
+                    rule.SyncSpeciesList(config.speciesConfigs.ConvertAll(s => s.speciesDefinition));
+                }
+
+                // B. Draw Header
                 Rect headerRect = new Rect(position.x, currentRect.y, position.width, HEADER_HEIGHT);
-                DrawTableHeader(headerRect);
+                DrawDynamicHeader(headerRect, listProp);
                 currentRect.y += HEADER_HEIGHT;
 
-                // Draw Rows
-                EditorGUI.BeginChangeCheck();
-                
-                foreach (var speciesDef in availableSpecies)
+                // C. Draw Rows
+                for (int i = 0; i < listProp.arraySize; i++)
                 {
-                    if (speciesDef == null) continue;
-
+                    SerializedProperty element = listProp.GetArrayElementAtIndex(i);
                     Rect rowRect = new Rect(position.x, currentRect.y, position.width, ROW_HEIGHT);
                     
-                    float currentWeight = GetCurrentWeight(rule, speciesDef);
-                    float newWeight = DrawSpeciesRow(rowRect, speciesDef.name, currentWeight);
-
-                    if (!Mathf.Approximately(currentWeight, newWeight))
-                    {
-                        UpdateRuleWeight(rule, speciesDef, newWeight);
-                    }
-
+                    DrawDynamicRow(rowRect, element);
                     currentRect.y += ROW_HEIGHT;
                 }
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    rule.OnValidate(); 
-                    property.serializedObject.Update(); 
-                    EditorUtility.SetDirty(property.serializedObject.targetObject);
-                }
-            }
-            else
-            {
-                Rect infoRect = new Rect(position.x, currentRect.y, position.width, ROW_HEIGHT);
-                EditorGUI.HelpBox(infoRect, "No Species defined in SwarmConfig.", MessageType.Info);
             }
 
             EditorGUI.EndProperty();
         }
 
-        // --- Helpers ---
+        // --- DYNAMIC COLUMNS LOGIC ---
 
-        private void DrawTableHeader(Rect rect)
+        private void DrawDynamicRow(Rect rect, SerializedProperty element)
+        {
+            // 1. Calculate Layout
+            float nameWidth = rect.width * NAME_WIDTH_PCT;
+            float remainingWidth = rect.width * (1f - NAME_WIDTH_PCT);
+            
+            // Count parameters (subtract 1 for the 'species' field)
+            int paramCount = CountVisibleChildren(element) ;
+            if (paramCount < 1) paramCount = 1;
+
+            // Calculate exact width per parameter
+            float paramWidth = remainingWidth / paramCount;
+
+            // 2. Draw Species Name
+            SerializedProperty speciesProp = element.FindPropertyRelative("species");
+            string labelName = (speciesProp.objectReferenceValue != null) ? speciesProp.objectReferenceValue.name : "Null";
+            
+            Rect nameRect = new Rect(rect.x, rect.y, nameWidth, rect.height);
+            EditorGUI.LabelField(nameRect, labelName, EditorStyles.miniLabel);
+
+            // 3. Draw Parameters
+            float currentX = rect.x + nameWidth;
+            var iter = element.Copy();
+            var end = iter.GetEndProperty();
+            
+            if (iter.NextVisible(true))
+            {
+                do
+                {
+                    if (SerializedProperty.EqualContents(iter, end)) break;
+                    if (iter.name == "species") continue; // Skip the key
+
+                    // Draw field in its calculated slot
+                    Rect propRect = new Rect(currentX, rect.y + 1, paramWidth - 4, rect.height - 2);
+                    EditorGUI.PropertyField(propRect, iter, GUIContent.none);
+                    
+                    currentX += paramWidth;
+                } while (iter.NextVisible(false));
+            }
+        }
+
+        private void DrawDynamicHeader(Rect rect, SerializedProperty listProp)
         {
             EditorGUI.DrawRect(rect, new Color(0.1f, 0.1f, 0.1f, 0.2f));
+            if (listProp.arraySize == 0) return;
+
+            SerializedProperty element = listProp.GetArrayElementAtIndex(0);
+
+            // 1. Layout
+            float nameWidth = rect.width * NAME_WIDTH_PCT;
+            float remainingWidth = rect.width * (1f - NAME_WIDTH_PCT);
             
-            Rect col1 = new Rect(rect.x + 5, rect.y, rect.width * 0.6f, rect.height);
-            Rect col2 = new Rect(rect.x + rect.width * 0.6f, rect.y, rect.width * 0.4f, rect.height);
+            int paramCount = CountVisibleChildren(element);
+            if (paramCount < 1) paramCount = 1;
+            float paramWidth = remainingWidth / paramCount;
 
-            EditorGUI.LabelField(col1, "Target Species", EditorStyles.miniBoldLabel);
-            EditorGUI.LabelField(col2, "Weight Impact", EditorStyles.miniBoldLabel);
-        }
+            // 2. Species Header
+            EditorGUI.LabelField(new Rect(rect.x + 5, rect.y, nameWidth, rect.height), "Species", EditorStyles.miniBoldLabel);
 
-        private float DrawSpeciesRow(Rect rect, string name, float currentWeight)
-        {
-            Rect labelRect = new Rect(rect.x + 10, rect.y, rect.width * 0.6f - 10, rect.height);
-            Rect valueRect = new Rect(rect.x + rect.width * 0.6f, rect.y + 2, rect.width * 0.35f, rect.height - 4);
+            // 3. Parameter Headers
+            float currentX = rect.x + nameWidth;
+            var iter = element.Copy();
+            var end = iter.GetEndProperty();
 
-            if (currentWeight == 0) GUI.enabled = false;
-            EditorGUI.LabelField(labelRect, name);
-            GUI.enabled = true;
-
-            return EditorGUI.FloatField(valueRect, currentWeight);
-        }
-
-        private List<SpeciesDefinition> GetSpeciesFromConfig(SerializedObject so)
-        {
-            var results = new List<SpeciesDefinition>();
-            SerializedProperty listProp = so.FindProperty("speciesConfigs");
-
-            if (listProp != null && listProp.isArray)
+            if (iter.NextVisible(true))
             {
-                for (int i = 0; i < listProp.arraySize; i++)
+                do
                 {
-                    var element = listProp.GetArrayElementAtIndex(i);
-                    var defProp = element.FindPropertyRelative("speciesDefinition");
-                    
-                    if (defProp != null && defProp.objectReferenceValue is SpeciesDefinition def)
-                    {
-                        if (!results.Contains(def)) results.Add(def);
-                    }
-                }
+                    if (SerializedProperty.EqualContents(iter, end)) break;
+                    if (iter.name == "species") continue;
+
+                    // Use variable name as header (e.g. "Weight", "Radius")
+                    EditorGUI.LabelField(new Rect(currentX, rect.y, paramWidth, rect.height), iter.displayName, EditorStyles.miniBoldLabel);
+                    currentX += paramWidth;
+                } while (iter.NextVisible(false));
             }
-            return results;
         }
 
-        private float GetCurrentWeight(SteeringRule rule, SpeciesDefinition species)
+        private int CountVisibleChildren(SerializedProperty prop)
         {
-            var entry = rule.speciesWeights.FirstOrDefault(sw => sw.species == species);
-            return entry.species != null ? entry.weight : 0f;
-        }
-
-        private void UpdateRuleWeight(SteeringRule rule, SpeciesDefinition species, float newWeight)
-        {
-            rule.speciesWeights.RemoveAll(sw => sw.species == species);
-            if (Mathf.Abs(newWeight) > 0.001f)
+            int count = 0;
+            var iter = prop.Copy();
+            var end = iter.GetEndProperty();
+            if (iter.NextVisible(true))
             {
-                rule.speciesWeights.Add(new SpeciesWeight { species = species, weight = newWeight });
+                do
+                {
+                    if (SerializedProperty.EqualContents(iter, end)) break;
+                    count++;
+                } while (iter.NextVisible(false));
             }
+            return count;
         }
-        
+
+        // --- HELPERS ---
+
+        private SwarmConfig GetConfigFromObject(SerializedObject so)
+        {
+            // If we are editing the Config directly
+            if (so.targetObject is SwarmConfig config) return config;
+            
+            // If we are editing the Manager (embedded inspector)
+            if (so.targetObject is SwarmManager manager) return manager.Config;
+
+            return null;
+        }
+
         private void ShowTypeSelector(SerializedProperty property)
         {
+            // (Same TypeSelector logic as before...)
             var menu = new GenericMenu();
             var types = TypeCache.GetTypesDerivedFrom<SteeringRule>()
                 .Where(t => !t.IsAbstract && !t.IsGenericType)
@@ -223,7 +238,7 @@ namespace SwarmLab.Editor
             {
                 menu.AddItem(new GUIContent(type.Name), false, () =>
                 {
-                    var instance = Activator.CreateInstance(type);
+                    var instance = System.Activator.CreateInstance(type);
                     property.serializedObject.Update();
                     property.managedReferenceValue = instance;
                     property.serializedObject.ApplyModifiedProperties();

@@ -24,8 +24,8 @@ MonoBehaviour:
     - rid: 1757164237908869232
   - speciesDefinition: {fileID: 11400000, guid: 6e2116b14fc0ae6449eb18225ac67db9, type: 2}
     count: 100
-    spawnRadius: 7.9655914
-    spawnOffset: {x: 1.7885056, y: 0, z: 4.857131}
+    spawnRadius: 7.479646
+    spawnOffset: {x: 1.8228953, y: 0, z: 2.3992887}
     steeringRules:
     - rid: 1757164237908869229
     - rid: 1757164237908869234
