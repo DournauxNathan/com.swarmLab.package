@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0237a3e60404d14897d42c176399b3b, type: 3}
+  m_Name: HumanZombieConfig
+  m_EditorClassIdentifier: Assembly-CSharp::SwarmLab.SwarmConfig
+  speciesConfigs:
+  - speciesDefinition: {fileID: 11400000, guid: 33d979d2f35206945a352df996948e96, type: 2}
+    count: 10
+    spawnRadius: 2.12
+    spawnOffset: {x: 9.308389, y: 0, z: 9.023289}
+    steeringRules:
+    - rid: 1757164259875225841
+    - rid: 1757164259875225839
+    - rid: 1757164259875225842
+  - speciesDefinition: {fileID: 11400000, guid: 6dd0ea9685331c44ba712f0e6271bafb, type: 2}
+    count: 100
+    spawnRadius: 7.479646
+    spawnOffset: {x: 1.8228953, y: 0, z: 2.3992887}
+    steeringRules:
+    - rid: 1757164259875225845
+    - rid: 1757164259875225844
+    - rid: 1757164259875225846
+  references:
+    version: 2
+    RefIds:
+    - rid: 1757164259875225839
+      type: {class: AlignmentRule, ns: , asm: Assembly-CSharp}
+      data:
+        maxForce: 2
+        speciesParams:
+        - species: {fileID: 11400000, guid: 33d979d2f35206945a352df996948e96, type: 2}
+          weight: 1
+          visionRadius: 3
+        - species: {fileID: 11400000, guid: 6dd0ea9685331c44ba712f0e6271bafb, type: 2}
+          weight: 0
+          visionRadius: 5
+    - rid: 1757164259875225841
+      type: {class: CohesionRule, ns: , asm: Assembly-CSharp}
+      data:
+        maxForce: 4
+        speciesParams:
+        - species: {fileID: 11400000, guid: 33d979d2f35206945a352df996948e96, type: 2}
+          weight: 1
+          visionRadius: 3
+        - species: {fileID: 11400000, guid: 6dd0ea9685331c44ba712f0e6271bafb, type: 2}
+          weight: 1.5
+          visionRadius: 10
+    - rid: 1757164259875225842
+      type: {class: SeparationRule, ns: , asm: Assembly-CSharp}
+      data:
+        speciesParams:
+        - species: {fileID: 11400000, guid: 33d979d2f35206945a352df996948e96, type: 2}
+          weight: 1.5
+          minDistance: 1.5
+        - species: {fileID: 11400000, guid: 6dd0ea9685331c44ba712f0e6271bafb, type: 2}
+          weight: 0
+          minDistance: 10
+        maxForce: 5
+    - rid: 1757164259875225844
+      type: {class: AlignmentRule, ns: , asm: Assembly-CSharp}
+      data:
+        maxForce: 4
+        speciesParams:
+        - species: {fileID: 11400000, guid: 33d979d2f35206945a352df996948e96, type: 2}
+          weight: 0
+          visionRadius: 0
+        - species: {fileID: 11400000, guid: 6dd0ea9685331c44ba712f0e6271bafb, type: 2}
+          weight: 1
+          visionRadius: 3
+    - rid: 1757164259875225845
+      type: {class: CohesionRule, ns: , asm: Assembly-CSharp}
+      data:
+        maxForce: 2
+        speciesParams:
+        - species: {fileID: 11400000, guid: 33d979d2f35206945a352df996948e96, type: 2}
+          weight: 0
+          visionRadius: 0
+        - species: {fileID: 11400000, guid: 6dd0ea9685331c44ba712f0e6271bafb, type: 2}
+          weight: 1
+          visionRadius: 6
+    - rid: 1757164259875225846
+      type: {class: SeparationRule, ns: , asm: Assembly-CSharp}
+      data:
+        speciesParams:
+        - species: {fileID: 11400000, guid: 33d979d2f35206945a352df996948e96, type: 2}
+          weight: 5
+          minDistance: 7
+        - species: {fileID: 11400000, guid: 6dd0ea9685331c44ba712f0e6271bafb, type: 2}
+          weight: 2
+          minDistance: 1
+        maxForce: 6
