@@ -275,20 +275,7 @@ namespace SwarmLab
                     
                     foreach (var rule in species.steeringRules)
                     {
-                        if (rule is Runtime.Rules.BoundingBoxRule boxRule)
-                        {
-                            Gizmos.color = Color.yellow; // Yellow cage
-                            Gizmos.DrawWireCube(boxRule.center, boxRule.size);
-
-                            // Optional: Draw the "Soft" threshold inside
-                            Gizmos.color = new Color(1, 1, 0, 0.3f);
-                            Vector3 thresholdSize = new Vector3(
-                                boxRule.size.x - boxRule.edgeThreshold * 2,
-                                boxRule.size.y - boxRule.edgeThreshold * 2,
-                                boxRule.size.z - boxRule.edgeThreshold * 2
-                            );
-                            Gizmos.DrawWireCube(boxRule.center, thresholdSize);
-                        }
+                        if (rule != null) rule.DrawGizmos();
                     }
                 }
             }

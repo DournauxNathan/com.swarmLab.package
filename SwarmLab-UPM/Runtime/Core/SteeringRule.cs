@@ -20,5 +20,7 @@ namespace SwarmLab
         public abstract Vector3 CalculateForce(Entity entity, List<Entity> neighbors);
         
         public virtual void OnValidate() { }
+        
+        public virtual void DrawGizmos() { }
     }
 }
