@@ -3,7 +3,7 @@
 ## Overview
 **SwarmLab** is a modular and reliable Unity package designed for simulating complex swarm behaviors like flocking, schooling, and leader following. It operates effectively in **Runtime**, offering a flexible rule-based system.
 
-![Demo of the sample project](Documentation~/demo.gif)
+![Demo of the sample project](SwarmLab-UPM/Documentation~/on-validate-changes-at-runtime.gif)
 
 ### Key Features
 - **Adjustable Behaviors**: Fine-tune Cohesion, Alignment, and Separation forces.
@@ -20,7 +20,7 @@
 1. Open the Unity Package Manager.
 2. Click the `+` button in the top left.
 3. Select "Add package from git URL..."
-4. Paste the following URL: `https://github.com/xaxam2001/SwarmLab.git?path=/SwarmLab-UP`
+4. Paste the following URL: `https://github.com/xaxam2001/SwarmLab.git?path=/SwarmLab-UPM`
 
 ### Via Source Code (Local)
 If you want to modify the package source code:
