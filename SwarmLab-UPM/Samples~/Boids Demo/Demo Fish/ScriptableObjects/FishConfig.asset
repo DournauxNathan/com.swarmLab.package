@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0237a3e60404d14897d42c176399b3b, type: 3}
+  m_Name: FishConfig
+  m_EditorClassIdentifier: SwarmLab.Runtime::SwarmLab.SwarmConfig
+  speciesConfigs:
+  - speciesDefinition: {fileID: 11400000, guid: 8a27f5cc407ad094b99b2e14df44410c, type: 2}
+    count: 30
+    spawnRadius: 8
+    spawnOffset: {x: 0, y: 0, z: 0}
+    steeringRules:
+    - rid: 1757164263818395887
+    - rid: 1757164263818395885
+    - rid: 1757164263818395888
+    - rid: 1757164263818395886
+  - speciesDefinition: {fileID: 11400000, guid: 7a36cc3645d2b8d4f8e0bf62c5a1afd6, type: 2}
+    count: 25
+    spawnRadius: 8
+    spawnOffset: {x: 0, y: 0, z: 0}
+    steeringRules:
+    - rid: 1757164263818395889
+    - rid: 1757164263818395890
+    - rid: 1757164263818395891
+    - rid: 1757164263818395892
+  references:
+    version: 2
+    RefIds:
+    - rid: 1757164263818395885
+      type: {class: AlignmentRule, ns: , asm: Assembly-CSharp}
+      data:
+        maxForce: 2
+        speciesParams:
+        - species: {fileID: 11400000, guid: 8a27f5cc407ad094b99b2e14df44410c, type: 2}
+          weight: 1
+          visionRadius: 5
+        - species: {fileID: 11400000, guid: 7a36cc3645d2b8d4f8e0bf62c5a1afd6, type: 2}
+          weight: 0
+          visionRadius: 0
+    - rid: 1757164263818395886
+      type: {class: BoundingBoxRule, ns: , asm: Assembly-CSharp}
+      data:
+        center: {x: 0, y: 0, z: 0}
+        size: {x: 25, y: 20, z: 30}
+        drawLimits: 1
+        edgeThreshold: 2
+        maxForce: 5
+    - rid: 1757164263818395887
+      type: {class: CohesionRule, ns: , asm: Assembly-CSharp}
+      data:
+        maxForce: 2
+        speciesParams:
+        - species: {fileID: 11400000, guid: 8a27f5cc407ad094b99b2e14df44410c, type: 2}
+          weight: 1
+          visionRadius: 5
+        - species: {fileID: 11400000, guid: 7a36cc3645d2b8d4f8e0bf62c5a1afd6, type: 2}
+          weight: 0
+          visionRadius: 0
+    - rid: 1757164263818395888
+      type: {class: SeparationRule, ns: , asm: Assembly-CSharp}
+      data:
+        speciesParams:
+        - species: {fileID: 11400000, guid: 8a27f5cc407ad094b99b2e14df44410c, type: 2}
+          weight: 1.5
+          minDistance: 1.5
+        - species: {fileID: 11400000, guid: 7a36cc3645d2b8d4f8e0bf62c5a1afd6, type: 2}
+          weight: 1
+          minDistance: 1
+        maxForce: 2
+    - rid: 1757164263818395889
+      type: {class: CohesionRule, ns: , asm: Assembly-CSharp}
+      data:
+        maxForce: 2
+        speciesParams:
+        - species: {fileID: 11400000, guid: 8a27f5cc407ad094b99b2e14df44410c, type: 2}
+          weight: 0
+          visionRadius: 0
+        - species: {fileID: 11400000, guid: 7a36cc3645d2b8d4f8e0bf62c5a1afd6, type: 2}
+          weight: 1
+          visionRadius: 3
+    - rid: 1757164263818395890
+      type: {class: AlignmentRule, ns: , asm: Assembly-CSharp}
+      data:
+        maxForce: 2
+        speciesParams:
+        - species: {fileID: 11400000, guid: 8a27f5cc407ad094b99b2e14df44410c, type: 2}
+          weight: 0
+          visionRadius: 0
+        - species: {fileID: 11400000, guid: 7a36cc3645d2b8d4f8e0bf62c5a1afd6, type: 2}
+          weight: 1
+          visionRadius: 3
+    - rid: 1757164263818395891
+      type: {class: SeparationRule, ns: , asm: Assembly-CSharp}
+      data:
+        speciesParams:
+        - species: {fileID: 11400000, guid: 8a27f5cc407ad094b99b2e14df44410c, type: 2}
+          weight: 1
+          minDistance: 1
+        - species: {fileID: 11400000, guid: 7a36cc3645d2b8d4f8e0bf62c5a1afd6, type: 2}
+          weight: 1.5
+          minDistance: 2
+        maxForce: 2
+    - rid: 1757164263818395892
+      type: {class: BoundingBoxRule, ns: , asm: Assembly-CSharp}
+      data:
+        center: {x: 0, y: 0, z: 0}
+        size: {x: 25, y: 20, z: 30}
+        drawLimits: 1
+        edgeThreshold: 2
+        maxForce: 5
