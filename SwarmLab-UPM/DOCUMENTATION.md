@@ -71,6 +71,11 @@ The `SwarmManager` is the brain of the simulation.
 1. In the Inspector, click the **Generate Swarm** button (green).
 2. Press **Play**.
 3. The entities (already instantiated) will start moving according to the active Steering Rules.
+4. You can modify steering rules and parameters during runtime to observe immediate changes in behavior.
+
+
+![Modify Rules at Runtime](Documentation~/on-validate-changes-at-runtime.gif)
+*Demonstration of real-time modifications on a 2D Boids configuration*
 
 ## Advanced topics
 
