@@ -3,11 +3,14 @@
 ## Overview
 **SwarmLab** is a modular and reliable Unity package designed for simulating complex swarm behaviors like flocking, schooling, and leader following. It operates effectively in **Runtime**, offering a flexible rule-based system.
 
-![Demo of the sample project](SwarmLab-UPM/Documentation~/on-validate-changes-at-runtime.gif)
-*Demonstration of real-time modifications on a 2D Boids configuration*
+<p align="center">
+  <img src="SwarmLab-UPM/Documentation~/on-validate-changes-at-runtime.gif" alt="Demo of the sample project" width="50%" />
+  <br>
+  <em>Demonstration of real-time modifications on a 2D Boids configuration</em>
+</p>
 
 ### Key Features
-- **Adjustable Behaviors**: Fine-tune Cohesion, Alignment, and Separation forces.
+- **Adjustable Behaviors**: Fine-tune customizable steering rules to create unique swarm dynamics.
 - **Multi-Species Support**: Create complex ecosystems where different species interacting with custom weights.
 - **Dual Simulation Modes**: seamless support for **Volumetric (3D)** and **Planar (2D)** environments.
 - **Extensible Architecture**: Easily add custom `SteeringRule` classes to define unique behaviors.

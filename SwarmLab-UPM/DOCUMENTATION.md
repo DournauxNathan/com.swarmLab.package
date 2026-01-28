@@ -38,23 +38,33 @@ If you want to modify the package source code:
 The `SwarmConfig` asset defines *who* is in the swarm.
 1. Right-click in the Project window.
 2. Navigate to **Create > SwarmLab > Swarm Config**.
-![Create Swarm Config](Documentation~/create-swarmConfig-so.gif)
+<p align="center">
+  <img src="Documentation~/create-swarmConfig-so.gif" width="50%" alt="Create Swarm Config" />
+</p>
 3. In the Inspector, you can add "Species Configs".
 
-![Configure Swarm Config](Documentation~/config-swarmConfig-so.gif)
+<p align="center">
+  <img src="Documentation~/config-swarmConfig-so.gif" width="50%" alt="Configure Swarm Config" />
+</p>
 4. For each species, assign a **Species Definition**.
    - You can add **Steering Rules** to each species configuration to define their behavior.
 
-   ![Add Rules](Documentation~/add-rule-foreach-species.gif)
+   <p align="center">
+  <img src="Documentation~/add-rule-foreach-species.gif" width="50%" alt="Add Rules" />
+</p>
 
 5. To create a Species Definition:
    - Right-click > **Create > SwarmLab > Species Definition**.
-   ![Create Species Definition](Documentation~/create-species-so.gif)
+   <p align="center">
+  <img src="Documentation~/create-species-so.gif" width="50%" alt="Create Species Definition" />
+</p>
    - **Prefab**: Assign the GameObject to spawn.
    - **Species Name**: The unique identifier for this species (used in rules).
    - **Max Speed**: The absolute speed limit for entities of this species.
 
-![Species Definition Inspector](Documentation~/config-specie-in-inspector.png)
+<p align="center">
+  <img src="Documentation~/config-specie-in-inspector.png" width="50%" alt="Species Definition Inspector" />
+</p>
 
 ### 2. Setting up the Swarm Manager
 The `SwarmManager` is the brain of the simulation.
@@ -65,7 +75,9 @@ The `SwarmManager` is the brain of the simulation.
    - By default, the simulation is **Volumetric** (3D sphere).
    - To switch to **Planar** (2D), assign a Transform to the `Planar Boundary` field.
    - Shortcut: Right-click the `SwarmManager` component header and select **Create Simulation Plane**. This will automatically generate a boundary plane and switch the mode to Planar.
-   ![Create Planar Simulation](Documentation~/create-simulation-planar-and-change-planar-settings.gif)
+   <p align="center">
+  <img src="Documentation~/create-simulation-planar-and-change-planar-settings.gif" width="50%" alt="Create Planar Simulation" />
+</p>
 
 ### 3. Running the Simulation
 1. In the Inspector, click the **Generate Swarm** button (green).
@@ -74,8 +86,12 @@ The `SwarmManager` is the brain of the simulation.
 4. You can modify steering rules and parameters during runtime to observe immediate changes in behavior.
 
 
-![Modify Rules at Runtime](Documentation~/on-validate-changes-at-runtime.gif)
-*Demonstration of real-time modifications on a 2D Boids configuration*
+<p align="center">
+  <img src="Documentation~/on-validate-changes-at-runtime.gif" alt="Demonstration of real-time modifications on a 2D Boids configuration" width="50%" />
+  <br>
+  <em>Demonstration of real-time modifications on a 2D Boids configuration</em>
+</p>
+
 
 ## Advanced topics
 
@@ -173,3 +189,9 @@ Most rules share these settings:
 The package includes a **Demo Scene** located in `Samples/Demo Scene`.
 - This scene demonstrates a multi-species setup with Alignment, Cohesion, and Separation rules.
 - To install it, go to the Package Manager > SwarmLab > Samples and click **Import**.
+
+<p align="center">
+  <img src="Documentation~/on-validate-changes-at-runtime.gif" alt="Demo of the sample project" width="50%" />
+  <br>
+  <em>Demo of the sample project</em>
+</p>
