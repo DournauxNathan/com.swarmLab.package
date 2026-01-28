@@ -27,5 +27,5 @@ If you want to modify the package source code:
 
 Documentation
 ---
-See [Documentation.md](SwarmLab-UPM/Documentation.md) for full details on workflows, configuration.
+See [Documentation.md](SwarmLab-UPM/DOCUMENTATION.md) for full details on workflows, configuration.
 
