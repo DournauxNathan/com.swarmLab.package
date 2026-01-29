@@ -45,20 +45,20 @@ The `SwarmConfig` asset defines *who* is in the swarm.
 1. Right-click in the Project window.
 2. Navigate to **Create > SwarmLab > Swarm Config**.
 <p align="center">
-  <img src="Documentation~/create-swarmConfig-so.gif" width="960" alt="Create Swarm Config" />
+  <img src="create-swarmConfig-so.gif" width="960" alt="Create Swarm Config" />
 </p>
 <table width="100%">
 <tr>
 <td width="50%" valign="top">
 3. In the Inspector, you can add "Species Configs".<br><br>
-<img src="Documentation~/config-swarmConfig-so.gif" width="482" alt="Configure Swarm Config" />
+<img src="config-swarmConfig-so.gif" width="482" alt="Configure Swarm Config" />
 </td>
 <td width="50%" valign="top">
 4. For each species, assign a <b>Species Definition</b>.
 <br>
 - You can add <b>Steering Rules</b> to each species to define behavior.
 <br><br>
-<img src="Documentation~/add-rule-foreach-species.gif" width="448" alt="Add Rules" />
+<img src="add-rule-foreach-species.gif" width="448" alt="Add Rules" />
 </td>
 </tr>
 </table>
@@ -66,12 +66,12 @@ The `SwarmConfig` asset defines *who* is in the swarm.
 5. To create a Species Definition:
    - Right-click > **Create > SwarmLab > Species Definition**.
    <p align="center">
-  <img src="Documentation~/create-species-so.gif" width="1396" alt="Create Species Definition" />
+  <img src="create-species-so.gif" width="1396" alt="Create Species Definition" />
 </p>
    <table width="100%">
    <tr>
    <td width="50%" valign="top">
-   <img src="Documentation~/config-specie-in-inspector.png" width="100%" alt="Species Definition Inspector" />
+   <img src="config-specie-in-inspector.png" width="100%" alt="Species Definition Inspector" />
    </td>
    <td width="50%" valign="top">
    <ul>
@@ -93,12 +93,12 @@ The `SwarmManager` is the brain of the simulation.
      - In this mode, you can move the spawn zones and adjust the entity count.
      - **Note**: You must click **Generate Swarm** again after moving spawn zones to apply changes.
      <p align="center">
-       <img src="Documentation~/create-volumetric-simulation-and-update-spawn-settings.gif" width="50%" alt="Volumetric Simulation Settings" />
+       <img src="create-volumetric-simulation-and-update-spawn-settings.gif" width="50%" alt="Volumetric Simulation Settings" />
      </p>
    - To switch to **Planar** (2D), assign a Transform to the `Planar Boundary` field.
    - Shortcut: Right-click the `SwarmManager` component header and select **Create Simulation Plane**. This will automatically generate a boundary plane and switch the mode to Planar.
    <p align="center">
-  <img src="Documentation~/create-simulation-planar-and-change-planar-settings.gif" width="50%" alt="Create Planar Simulation" />
+  <img src="create-simulation-planar-and-change-planar-settings.gif" width="50%" alt="Create Planar Simulation" />
 </p>
 
 ### 3. Running the Simulation
@@ -109,7 +109,7 @@ The `SwarmManager` is the brain of the simulation.
 
 
 <p align="center">
-  <img src="Documentation~/on-validate-changes-at-runtime.gif" alt="Demonstration of real-time modifications on a 2D Boids configuration" width="50%" />
+  <img src="on-validate-changes-at-runtime.gif" alt="Demonstration of real-time modifications on a 2D Boids configuration" width="50%" />
   <br>
   <em>Demonstration of real-time modifications on a 2D Boids configuration</em>
 </p>
