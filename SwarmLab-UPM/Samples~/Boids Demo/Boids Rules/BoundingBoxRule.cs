@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using SwarmLab;
+using SwarmLab.Core;
 using UnityEngine;
 
 [System.Serializable]

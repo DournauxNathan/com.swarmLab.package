@@ -1,3 +1,4 @@
 {
-	"name": "SwarmLab.Runtime"
+	"name": "SwarmLab.Runtime",
+	"rootNamespace": "SwarmLab"
 }

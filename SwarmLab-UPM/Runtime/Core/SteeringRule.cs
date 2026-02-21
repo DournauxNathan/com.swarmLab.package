@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SwarmLab
+namespace SwarmLab.Core
 {
     // The base "Contract" for per-species settings
     [System.Serializable]

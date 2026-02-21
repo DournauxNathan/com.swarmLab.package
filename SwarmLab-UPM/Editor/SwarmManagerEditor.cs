@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using SwarmLab.Core;
 
 namespace SwarmLab.Editor
 {

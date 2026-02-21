@@ -1,6 +1,6 @@
 {
     "name": "SwarmLab.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "SwarmLab",
     "references": [
         "SwarmLab.Runtime"
     ],

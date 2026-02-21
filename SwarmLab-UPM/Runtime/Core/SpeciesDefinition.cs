@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SwarmLab
+namespace SwarmLab.Core
 {
 
     [CreateAssetMenu(fileName = "Species Definition", menuName = "SwarmLab/Species Definition")]

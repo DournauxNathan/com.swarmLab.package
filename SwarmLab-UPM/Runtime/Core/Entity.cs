@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SwarmLab
+namespace SwarmLab.Core
 {
     [System.Serializable]
     public class Entity

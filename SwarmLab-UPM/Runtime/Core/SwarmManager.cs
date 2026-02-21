@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace SwarmLab
+namespace SwarmLab.Core
 {
 
     public class SwarmManager : MonoBehaviour

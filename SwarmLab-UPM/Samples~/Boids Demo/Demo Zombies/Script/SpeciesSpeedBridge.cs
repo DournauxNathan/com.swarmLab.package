@@ -1,4 +1,4 @@
-using SwarmLab;
+using SwarmLab.Core;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SwarmLab
+namespace SwarmLab.Core
 {
     // The Configuration for a single species in this specific swarm
     [System.Serializable]
