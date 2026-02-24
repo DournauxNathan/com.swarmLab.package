@@ -103,10 +103,9 @@ namespace SwarmLab.Core
 
                 // LIMIT SPEED (Crucial!)
                 // Without this, they will accelerate infinitely and disappear.
-                float maxSpeed = 5f; // We can expose this in Config later
-                if (entity.Velocity.sqrMagnitude > maxSpeed * maxSpeed)
+                if (entity.Velocity.sqrMagnitude > entity.Species.maxSpeed * entity.Species.maxSpeed)
                 {
-                    entity.Velocity = entity.Velocity.normalized * maxSpeed;
+                    entity.Velocity = entity.Velocity.normalized * entity.Species.maxSpeed;
                 }
             }
 
